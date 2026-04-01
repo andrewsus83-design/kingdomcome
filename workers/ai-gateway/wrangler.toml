@@ -14,6 +14,10 @@ HEYGEN_API_KEY = ""
 WORLD_ANVIL_API_KEY = ""
 R2_ASSETS_BASE_URL = "https://assets.kingdomcome.app"
 
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "kingdom-come-assets"
+
 [limits]
 cpu_ms = 50
 
