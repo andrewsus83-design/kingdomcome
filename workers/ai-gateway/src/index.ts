@@ -31,7 +31,7 @@ export interface Env {
   RUNWAY_API_KEY: string;
   HEYGEN_API_KEY: string;
   WORLD_ANVIL_API_KEY: string;
-  R2_ASSETS_BASE_URL: string; // e.g. https://assets.kingdomcome.app
+  R2_ASSETS_BASE_URL: string; // e.g. https://assets.kingdomcomeapp.com
 }
 
 // ── Rate limiting (in-memory per isolate — coarse guard) ──────────────────────

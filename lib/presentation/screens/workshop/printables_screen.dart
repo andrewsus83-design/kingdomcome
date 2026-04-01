@@ -76,7 +76,7 @@ const _printables = [
     category: _PrintableCategory.coloringPages,
     ageRecommendation: 'Ages 6+',
     estimatedTime: '20–30 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/saint_francis.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/saint_francis.pdf',
   ),
   _PrintableItem(
     id: 'nativity_coloring',
@@ -85,7 +85,7 @@ const _printables = [
     category: _PrintableCategory.coloringPages,
     ageRecommendation: 'Ages 5+',
     estimatedTime: '15–25 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/nativity.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/nativity.pdf',
   ),
   _PrintableItem(
     id: 'rosary_mysteries_coloring',
@@ -94,7 +94,7 @@ const _printables = [
     category: _PrintableCategory.coloringPages,
     ageRecommendation: 'Ages 7+',
     estimatedTime: '30–45 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/rosary_mysteries.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/rosary_mysteries.pdf',
   ),
   _PrintableItem(
     id: 'advent_coloring',
@@ -103,7 +103,7 @@ const _printables = [
     category: _PrintableCategory.coloringPages,
     ageRecommendation: 'Ages 5+',
     estimatedTime: '15–20 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/advent.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/advent.pdf',
   ),
   // Papercraft
   _PrintableItem(
@@ -113,7 +113,7 @@ const _printables = [
     category: _PrintableCategory.papercraft,
     ageRecommendation: 'Ages 8+',
     estimatedTime: '45–60 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/noahs_ark_3d.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/noahs_ark_3d.pdf',
   ),
   _PrintableItem(
     id: 'nativity_stable_papercraft',
@@ -123,7 +123,7 @@ const _printables = [
     ageRecommendation: 'Ages 9+',
     estimatedTime: '60–90 min',
     pdfUrl:
-        'https://assets.kingdomcome.app/printables/nativity_stable.pdf',
+        'https://assets.kingdomcomeapp.com/printables/nativity_stable.pdf',
   ),
   _PrintableItem(
     id: 'cross_bookmark',
@@ -133,7 +133,7 @@ const _printables = [
     ageRecommendation: 'Ages 6+',
     estimatedTime: '10–15 min',
     pdfUrl:
-        'https://assets.kingdomcome.app/printables/cross_bookmark.pdf',
+        'https://assets.kingdomcomeapp.com/printables/cross_bookmark.pdf',
   ),
   // Activity Sheets
   _PrintableItem(
@@ -144,7 +144,7 @@ const _printables = [
     ageRecommendation: 'Ages 8+',
     estimatedTime: '15–20 min',
     pdfUrl:
-        'https://assets.kingdomcome.app/printables/wordsearch.pdf',
+        'https://assets.kingdomcomeapp.com/printables/wordsearch.pdf',
   ),
   _PrintableItem(
     id: 'calligraphy_verse',
@@ -153,7 +153,7 @@ const _printables = [
     category: _PrintableCategory.activitySheets,
     ageRecommendation: 'Ages 10+',
     estimatedTime: '20–30 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/calligraphy.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/calligraphy.pdf',
   ),
   _PrintableItem(
     id: 'liturgical_calendar',
@@ -162,7 +162,7 @@ const _printables = [
     category: _PrintableCategory.activitySheets,
     ageRecommendation: 'Ages 9+',
     estimatedTime: '30–40 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/liturgical_calendar.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/liturgical_calendar.pdf',
   ),
   // Rosary Guide
   _PrintableItem(
@@ -172,7 +172,7 @@ const _printables = [
     category: _PrintableCategory.rosaryGuide,
     ageRecommendation: 'Ages 8+',
     estimatedTime: '60–90 min',
-    pdfUrl: 'https://assets.kingdomcome.app/printables/rosary_guide.pdf',
+    pdfUrl: 'https://assets.kingdomcomeapp.com/printables/rosary_guide.pdf',
   ),
 ];
 

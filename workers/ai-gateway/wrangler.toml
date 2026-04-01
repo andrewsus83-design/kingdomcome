@@ -12,7 +12,7 @@ MODAL_MUSIC_URL = ""
 RUNWAY_API_KEY = ""
 HEYGEN_API_KEY = ""
 WORLD_ANVIL_API_KEY = ""
-R2_ASSETS_BASE_URL = "https://assets.kingdomcome.app"
+R2_ASSETS_BASE_URL = "https://assets.kingdomcomeapp.com"
 
 [[r2_buckets]]
 binding = "ASSETS_BUCKET"
