@@ -19,7 +19,7 @@ class _ArtsGalleryScreenState extends ConsumerState<ArtsGalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final artworksAsync = ref.watch(userArtworksProvider);
+    final artworksAsync = ref.watch(artsNotifierProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B2A),

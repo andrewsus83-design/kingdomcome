@@ -2,11 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:kingdomcome/core/constants/game_constants.dart';
 import 'package:kingdomcome/data/models/ark/ark_node_model.dart';
-import 'package:kingdomcome/data/models/bible_story/bible_story_model.dart';
 import 'package:kingdomcome/presentation/providers/auth_provider.dart';
 import 'package:kingdomcome/presentation/providers/resource_provider.dart';
-import 'package:kingdomcome/data/models/resources/resource_model.dart';
 
 part 'ark_provider.g.dart';
 

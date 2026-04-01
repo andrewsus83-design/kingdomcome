@@ -87,6 +87,7 @@ class AiChatNotifier extends _$AiChatNotifier {
         data: {
           'message': trimmed,
           'ageGroup': user.ageGroup,
+          if (_saintSystemPrompt != null) 'systemPrompt': _saintSystemPrompt,
           'history': state
               .take(state.length - 1) // exclude the message we just appended
               .where((m) => !m.isError)
@@ -134,6 +135,43 @@ class AiChatNotifier extends _$AiChatNotifier {
   /// Clears all messages in the current conversation.
   void clearHistory() {
     state = [];
+    _saintSystemPrompt = null;
+  }
+
+  // ── Saint persona ─────────────────────────────────────────────────────────
+
+  String? _saintSystemPrompt;
+
+  /// Pre-seeds the AI with a saint character persona for the next conversation.
+  ///
+  /// After calling this, the next [sendMessage] will use a system prompt that
+  /// keeps the AI in character as [saintName].
+  void setSaintPersona({
+    required String saintName,
+    required String saintBio,
+    required String patronage,
+    required String era,
+  }) {
+    _saintSystemPrompt =
+        'You are $saintName, a Catholic saint from the $era period. '
+        'Your patronage includes: $patronage. '
+        'Brief context about you: $saintBio. '
+        'Respond in first person as $saintName, sharing your wisdom about '
+        'Catholic faith, prayer, and virtue. Stay in character but be '
+        'age-appropriate and encouraging for children and teenagers ages 8-18. '
+        'Draw on your real historical life and writings when possible.';
+
+    // Inject a system-level greeting as first AI message
+    final greeting = 'Greetings, young pilgrim! I am $saintName. '
+        'How may I share the light of God\'s love with you today?';
+
+    state = [
+      ChatMessage(
+        role: 'assistant',
+        content: greeting,
+        timestamp: DateTime.now(),
+      ),
+    ];
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────

@@ -62,42 +62,7 @@ class _PlaceholderScreen extends StatelessWidget {
 // Auth screen adapters
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
-  @override
-  Widget build(BuildContext context) {
-    // Use the actual splash screen if it exists, else placeholder
-    try {
-      return const SplashScreen();
-    } catch (_) {
-      return const _PlaceholderScreen(title: 'Splash');
-    }
-  }
-}
-
-class _SignInScreen extends StatelessWidget {
-  const _SignInScreen();
-  @override
-  Widget build(BuildContext context) {
-    try {
-      return const LoginScreen();
-    } catch (_) {
-      return const _PlaceholderScreen(title: 'Sign In');
-    }
-  }
-}
-
-class _SignUpScreen extends StatelessWidget {
-  const _SignUpScreen();
-  @override
-  Widget build(BuildContext context) {
-    try {
-      return const RegisterScreen();
-    } catch (_) {
-      return const _PlaceholderScreen(title: 'Sign Up');
-    }
-  }
-}
+// Auth screen aliases for clarity in route builder closures
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Error / Not-found screens
@@ -203,7 +168,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.splash,
         name: 'splash',
-        builder: (context, state) => const _SplashScreen(),
+        builder: (context, state) => const SplashScreen(),
       ),
 
       // ── Onboarding ─────────────────────────────────────────────────────────
@@ -218,12 +183,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.signIn,
         name: 'sign-in',
-        builder: (context, state) => const _SignInScreen(),
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: RouteNames.signUp,
         name: 'sign-up',
-        builder: (context, state) => const _SignUpScreen(),
+        builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: RouteNames.forgotPassword,
