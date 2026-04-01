@@ -89,6 +89,7 @@ abstract final class RouteNames {
   static const String workshopBanner = '/workshop/banner';
   static const String workshopGallery = '/workshop/gallery';
   static const String workshopPrintables = '/workshop/printables';
+  static const String workshopVideoTutorials = '/workshop/videos';
 
   // ── Soul sub-routes ───────────────────────────────────────────────────────
 
