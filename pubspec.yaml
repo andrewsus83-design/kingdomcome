@@ -56,6 +56,9 @@ dependencies:
   # Secure storage
   flutter_secure_storage: ^9.0.0
 
+  # Timezone support (required by flutter_local_notifications for scheduling)
+  timezone: ^0.9.4
+
   # Icons
   cupertino_icons: ^1.0.8
 
