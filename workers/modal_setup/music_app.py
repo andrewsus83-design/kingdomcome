@@ -8,13 +8,16 @@ import modal
 
 app = modal.App("kingdom-come-music")
 
+# Use PyTorch CUDA base image — avoids torch version conflicts with audiocraft
 image = (
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install(
-        "torch",
-        "torchaudio",
-        "audiocraft",
-        "scipy",
+    modal.Image.from_registry(
+        "pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime",
+        add_python="3.11",
+    )
+    .run_commands(
+        "pip install --upgrade pip",
+        "pip install audiocraft",
+        "pip install scipy",
     )
 )
 
@@ -30,7 +33,6 @@ def generate(item: dict) -> dict:
     from audiocraft.models import MusicGen
     import base64
     import io
-    import torch
     import torchaudio
 
     prompt = item.get("prompt", "Peaceful Catholic Gregorian chant ambient")
@@ -40,22 +42,14 @@ def generate(item: dict) -> dict:
     model = MusicGen.get_pretrained("facebook/musicgen-small")
     model.set_generation_params(duration=duration)
 
-    descriptions = [prompt]
-    wav = model.generate(descriptions)  # shape: [1, channels, samples]
+    wav = model.generate([prompt])  # shape: [1, channels, samples]
 
-    # Export to MP3 via in-memory buffer
     buffer = io.BytesIO()
-    torchaudio.save(
-        buffer,
-        wav[0].cpu(),
-        model.sample_rate,
-        format="mp3",
-    )
+    torchaudio.save(buffer, wav[0].cpu(), model.sample_rate, format="mp3")
     buffer.seek(0)
-    audio_b64 = base64.b64encode(buffer.read()).decode()
 
     return {
-        "audio_base64": audio_b64,
+        "audio_base64": base64.b64encode(buffer.read()).decode(),
         "sample_rate": model.sample_rate,
         "format": "mp3",
         "duration_seconds": duration,
