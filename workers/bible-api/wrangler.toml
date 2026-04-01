@@ -8,7 +8,7 @@ binding = "BIBLE_BUCKET"
 bucket_name = "kingdom-come-bible"
 
 [vars]
-SUPABASE_URL = ""
+SUPABASE_URL = "https://diyimabdmsjykvitomgd.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY = ""
 
 [[rules]]

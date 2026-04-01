@@ -1,0 +1,49 @@
+# Supabase project configuration
+# Project: Kingdom Come
+# Project ID: diyimabdmsjykvitomgd
+# Dashboard: https://supabase.com/dashboard/project/diyimabdmsjykvitomgd
+
+[api]
+project_id = "diyimabdmsjykvitomgd"
+
+[db]
+port = 54322
+shadow_port = 54320
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[storage]
+file_size_limit = "50MiB"
+
+[auth]
+site_url = "https://kingdomcomeapp.com"
+additional_redirect_urls = [
+  "https://kingdomcomeapp.com",
+  "kingdomcome://auth"
+]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[functions.ai-chat-proxy]
+verify_jwt = true
+
+[functions.complete-quest]
+verify_jwt = true
+
+[functions.award-resources]
+verify_jwt = true
+
+[functions.unlock-saint]
+verify_jwt = true
+
+[functions.liturgical-events]
+verify_jwt = false
