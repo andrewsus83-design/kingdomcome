@@ -6,9 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdomcome/core/constants/app_colors.dart';
 import 'package:kingdomcome/core/constants/app_spacing.dart';
 import 'package:kingdomcome/core/constants/app_text_styles.dart';
+import 'package:kingdomcome/core/constants/game_constants.dart';
 import 'package:kingdomcome/presentation/providers/resource_provider.dart';
-import 'package:kingdomcome/data/models/resources/resource_model.dart';
-import 'package:kingdomcome/routing/route_names.dart';
 
 // ── Printable item model ───────────────────────────────────────────────────────
 

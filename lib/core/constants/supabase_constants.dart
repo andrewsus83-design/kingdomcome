@@ -62,7 +62,7 @@ abstract final class SupabaseConstants {
   /// Player notifications queue.
   static const String tableNotifications = 'player_notifications';
 
-  /// Generated saint character art (OpenArt).
+  /// Saint character art (uploaded manually to R2/Supabase Storage).
   static const String tableSaintArt = 'saint_generated_art';
 
   /// Generated story videos (Runway / HeyGen).
