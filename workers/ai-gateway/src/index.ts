@@ -3,22 +3,18 @@
  *
  * Routes AI requests to the appropriate upstream service:
  *   POST /chat                        → Magisterium AI (Catholic chat)
- *   POST /generate-image              → Modal.com Flux Schnell (arts & crafts)
- *   GET  /character/:slug             → R2 asset URL lookup (character art)
+ *   POST /generate-image              → Modal.com FLUX.1-dev H100 (image generation)
+ *   POST /stitch-video                → Modal.com FFmpeg (video stitching)
+ *   GET  /character/:category/:slug   → R2 asset URL lookup (character art)
  *   POST /generate-video              → Runway Gen 4.5 (Bible story videos)
  *   POST /create-avatar-video         → HeyGen API (avatar storyteller)
  *   POST /orchestrate                 → Claude API (Anthropic, complex workflows)
  *   POST /analyze-artwork             → Claude Vision (Masterpiece Scanner)
  *   GET  /wiki/:articleId             → World Anvil API (wiki content)
- *   POST /audio/narrate-verse         → Bark TTS via Modal.com
- *   POST /audio/narrate-story         → Bark TTS via Modal.com
- *   POST /audio/saint-voice           → Bark TTS via Modal.com
- *   POST /music/ambient               → MusicGen via Modal.com
- *   POST /music/victory-jingle        → MusicGen via Modal.com
+ *   GET  /audio/track/:path           → R2 pre-generated audio track URL
  */
 
 import { filterResponse, validateChatRequest } from "./content-filter";
-import { handleAudioRequest } from "./audio";
 
 // ── Env bindings ─────────────────────────────────────────────────────────────
 
@@ -26,8 +22,8 @@ export interface Env {
   MAGISTERIUM_API_KEY: string;
   ANTHROPIC_API_KEY: string;
   MODAL_API_KEY: string;
-  MODAL_TTS_URL: string;
-  MODAL_MUSIC_URL: string;
+  MODAL_FLUX_URL: string;   // https://andrewsus83-design--kingdom-come-flux-fluxmodel-generate.modal.run
+  MODAL_VIDEO_URL: string;  // https://andrewsus83-design--kingdom-come-video-stitch.modal.run
   RUNWAY_API_KEY: string;
   HEYGEN_API_KEY: string;
   WORLD_ANVIL_API_KEY: string;
@@ -170,31 +166,16 @@ export default {
       return handleWiki(wikiMatch[1], env);
     }
 
-    // ── Audio / Music routes (ElevenLabs TTS + MusicGen) ─────────────────────
-
-    // POST /audio/narrate-verse
-    if (pathname === "/audio/narrate-verse" && request.method === "POST") {
-      return handleAudioRequest(request, env);
+    // POST /stitch-video → Modal.com FFmpeg stitching
+    if (pathname === "/stitch-video" && request.method === "POST") {
+      return handleStitchVideo(request, env);
     }
 
-    // POST /audio/narrate-story
-    if (pathname === "/audio/narrate-story" && request.method === "POST") {
-      return handleAudioRequest(request, env);
-    }
-
-    // POST /audio/saint-voice
-    if (pathname === "/audio/saint-voice" && request.method === "POST") {
-      return handleAudioRequest(request, env);
-    }
-
-    // POST /music/ambient
-    if (pathname === "/music/ambient" && request.method === "POST") {
-      return handleAudioRequest(request, env);
-    }
-
-    // POST /music/victory-jingle
-    if (pathname === "/music/victory-jingle" && request.method === "POST") {
-      return handleAudioRequest(request, env);
+    // GET /audio/track/:path → R2 pre-generated audio URL
+    const audioMatch = pathname.match(/^\/audio\/track\/(.+)$/);
+    if (audioMatch && request.method === "GET") {
+      const trackPath = audioMatch[1].replace(/\.\./g, ""); // prevent path traversal
+      return jsonOk({ url: `${env.R2_ASSETS_BASE_URL}/audio/${trackPath}` });
     }
 
     return jsonError("Not found", 404);
@@ -440,23 +421,20 @@ async function handleGenerateImage(
   const safePrompt = `Catholic sacred art, child-friendly, illuminated manuscript style, stained glass aesthetic: ${prompt}`;
 
   try {
-    const modalResponse = await fetch(
-      "https://modal-labs--kingdom-come-flux.modal.run/generate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.MODAL_API_KEY}`,
-        },
-        body: JSON.stringify({
-          prompt: safePrompt,
-          width: 512,
-          height: 512,
-          num_inference_steps: 4, // Flux Schnell
-          guidance_scale: 0,
-        }),
-      }
-    );
+    const modalResponse = await fetch(env.MODAL_FLUX_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.MODAL_API_KEY}`,
+      },
+      body: JSON.stringify({
+        prompt: safePrompt,
+        width: 1080,
+        height: 1080,
+        steps: 28,
+        guidance_scale: 3.5,
+      }),
+    });
 
     if (!modalResponse.ok) {
       return jsonError("Image generation service temporarily unavailable.", 502);
@@ -649,6 +627,38 @@ async function handleOrchestrate(
     return jsonOk({ result: filtered.filteredText, safe: filtered.safe });
   } catch (err) {
     console.error("Orchestrate error:", err);
+    return jsonError("Internal server error.", 500);
+  }
+}
+
+async function handleStitchVideo(request: Request, env: Env): Promise<Response> {
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return jsonError("Invalid JSON body.");
+  }
+
+  try {
+    const modalResponse = await fetch(env.MODAL_VIDEO_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.MODAL_API_KEY}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!modalResponse.ok) {
+      const err = await modalResponse.text();
+      console.error("Modal video stitch error:", err);
+      return jsonError("Video stitching service temporarily unavailable.", 502);
+    }
+
+    const data = await modalResponse.json();
+    return jsonOk(data);
+  } catch (err) {
+    console.error("Stitch video error:", err);
     return jsonError("Internal server error.", 500);
   }
 }
