@@ -14,7 +14,7 @@ const _uuid = Uuid();
 
 const String _aiGatewayBase = String.fromEnvironment(
   'AI_GATEWAY_URL',
-  defaultValue: 'https://kingdom-come-ai-gateway.workers.dev',
+  defaultValue: 'https://kingdom-come-ai-gateway.andrewsus83.workers.dev',
 );
 
 @riverpod

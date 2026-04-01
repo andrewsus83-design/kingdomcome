@@ -16,7 +16,7 @@ final _supabase = Supabase.instance.client;
 // Bible API Worker base URL — injected via dart-define in production
 const String _bibleApiBase = String.fromEnvironment(
   'BIBLE_API_URL',
-  defaultValue: 'https://kingdom-come-bible-api.workers.dev',
+  defaultValue: 'https://kingdom-come-bible-api.andrewsus83.workers.dev',
 );
 
 final _dioProvider = Provider<Dio>((ref) {

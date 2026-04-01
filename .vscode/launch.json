@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Kingdom Come (dev)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=SUPABASE_URL=https://diyimabdmsjykvitomgd.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpeWltYWJkbXNqeWt2aXRvbWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MDYyMDgsImV4cCI6MjA4NzA4MjIwOH0.YbDq_1zLli12RY10EFi6yihhlzSYc8oNcUvirN9qp-Q",
+        "--dart-define=AI_GATEWAY_URL=https://kingdom-come-ai-gateway.andrewsus83.workers.dev"
+      ]
+    },
+    {
+      "name": "Kingdom Come (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=SUPABASE_URL=https://diyimabdmsjykvitomgd.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpeWltYWJkbXNqeWt2aXRvbWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MDYyMDgsImV4cCI6MjA4NzA4MjIwOH0.YbDq_1zLli12RY10EFi6yihhlzSYc8oNcUvirN9qp-Q",
+        "--dart-define=AI_GATEWAY_URL=https://kingdom-come-ai-gateway.andrewsus83.workers.dev"
+      ]
+    }
+  ]
+}

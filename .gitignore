@@ -36,3 +36,6 @@ Thumbs.db
 
 # Build outputs
 /build
+
+# Allow launch.json (no secrets — uses --dart-define, values come from env)
+!.vscode/launch.json
