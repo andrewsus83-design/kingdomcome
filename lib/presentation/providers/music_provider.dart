@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/services/audio_service.dart';
-import '../../core/theme/liturgical_colors.dart';
+import '../../core/theme/liturgical_colors.dart' hide LiturgicalSeason;
 import '../../data/repositories/music_repository.dart';
 import 'liturgical_calendar_provider.dart';
 

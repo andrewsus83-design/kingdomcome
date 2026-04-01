@@ -2,15 +2,7 @@ import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
 
-/// Liturgical seasons understood by [AudioService].
-enum LiturgicalSeason {
-  advent,
-  christmas,
-  ordinary,
-  lent,
-  easter,
-  pentecost,
-}
+import 'package:kingdomcome/core/theme/liturgical_colors.dart';
 
 /// Singleton audio service that manages background ambient music, sound
 /// effects, and ElevenLabs/MusicGen narration tracks.
