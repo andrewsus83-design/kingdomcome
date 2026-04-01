@@ -15,6 +15,16 @@ import 'package:kingdomcome/presentation/screens/kingdom/saint_chat_sheet.dart';
 import 'package:kingdomcome/presentation/screens/auth/login_screen.dart';
 import 'package:kingdomcome/presentation/screens/auth/register_screen.dart';
 import 'package:kingdomcome/presentation/screens/splash/splash_screen.dart';
+import 'package:kingdomcome/presentation/screens/games/games_hub_screen.dart';
+import 'package:kingdomcome/presentation/screens/games/rosary_runner_game.dart';
+import 'package:kingdomcome/presentation/screens/games/saint_defender_game.dart';
+import 'package:kingdomcome/presentation/screens/games/scripture_builder_game.dart';
+import 'package:kingdomcome/presentation/screens/games/virtue_forge_game.dart';
+import 'package:kingdomcome/presentation/screens/games/bible_trivia_duel_game.dart';
+import 'package:kingdomcome/presentation/screens/games/liturgy_calendar_puzzle_game.dart';
+import 'package:kingdomcome/presentation/screens/workshop/workshop_screen.dart';
+import 'package:kingdomcome/presentation/screens/soul/soul_screen.dart';
+import 'package:kingdomcome/presentation/screens/kingdom/building_detail_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Placeholder screen (used for not-yet-built sections)
@@ -288,26 +298,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'building/:buildingId',
                     name: 'building-detail',
-                    builder: (context, state) => _PlaceholderScreen(
-                      title: 'Building Detail',
-                      params: {
-                        'buildingId':
-                            state.pathParameters['buildingId'] ?? '',
-                      },
+                    builder: (context, state) => BuildingDetailScreen(
+                      buildingId: state.pathParameters['buildingId'] ?? '',
                     ),
-                    routes: [
-                      GoRoute(
-                        path: 'upgrade',
-                        name: 'building-upgrade',
-                        builder: (context, state) => _PlaceholderScreen(
-                          title: 'Building Upgrade',
-                          params: {
-                            'buildingId':
-                                state.pathParameters['buildingId'] ?? '',
-                          },
-                        ),
-                      ),
-                    ],
                   ),
                   GoRoute(
                     path: 'blueprints',
@@ -345,38 +338,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.academy,
                 name: 'academy',
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: 'The Academy'),
-                routes: [
-                  GoRoute(
-                    path: 'trivia',
-                    name: 'academy-trivia',
-                    builder: (context, state) =>
-                        const _PlaceholderScreen(title: 'Trivia Challenge'),
-                  ),
-                  GoRoute(
-                    path: 'puzzles',
-                    name: 'academy-puzzles',
-                    builder: (context, state) =>
-                        const _PlaceholderScreen(title: 'Puzzle Rooms'),
-                  ),
-                  GoRoute(
-                    path: 'leaderboard',
-                    name: 'academy-leaderboard',
-                    builder: (context, state) =>
-                        const _PlaceholderScreen(title: 'Academy Leaderboard'),
-                  ),
-                  GoRoute(
-                    path: 'game/:gameId',
-                    name: 'academy-game-detail',
-                    builder: (context, state) => _PlaceholderScreen(
-                      title: 'Game Detail',
-                      params: {
-                        'gameId': state.pathParameters['gameId'] ?? '',
-                      },
-                    ),
-                  ),
-                ],
+                builder: (context, state) => const GamesHubScreen(),
               ),
             ],
           ),
@@ -387,8 +349,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.workshop,
                 name: 'workshop',
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: 'The Workshop'),
+                builder: (context, state) => const WorkshopScreen(),
                 routes: [
                   GoRoute(
                     path: 'scanner',
@@ -437,8 +398,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.soul,
                 name: 'soul',
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: 'My Soul'),
+                builder: (context, state) => const SoulScreen(),
                 routes: [
                   GoRoute(
                     path: 'prayer-chat',
@@ -561,6 +521,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notFound,
         name: 'not-found',
         builder: (context, state) => const _NotFoundScreen(),
+      ),
+
+      // ── Full-screen games (no shell / nav bar) ────────────────────────────
+      GoRoute(
+        path: '/games/rosary-runner',
+        name: 'game-rosary-runner',
+        builder: (context, state) => const RosaryRunnerGameScreen(),
+      ),
+      GoRoute(
+        path: '/games/saint-defender',
+        name: 'game-saint-defender',
+        builder: (context, state) => const SaintDefenderGameScreen(),
+      ),
+      GoRoute(
+        path: '/games/scripture-builder',
+        name: 'game-scripture-builder',
+        builder: (context, state) => const ScriptureBuilderGameScreen(),
+      ),
+      GoRoute(
+        path: '/games/virtue-forge',
+        name: 'game-virtue-forge',
+        builder: (context, state) => const VirtueForgeGameScreen(),
+      ),
+      GoRoute(
+        path: '/games/bible-trivia-duel',
+        name: 'game-bible-trivia-duel',
+        builder: (context, state) => const BibleTriviaDuelGameScreen(),
+      ),
+      GoRoute(
+        path: '/games/liturgy-calendar',
+        name: 'game-liturgy-calendar',
+        builder: (context, state) => const LiturgyCalendarPuzzleGameScreen(),
       ),
     ],
   );
