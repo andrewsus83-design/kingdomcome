@@ -13,6 +13,7 @@ part 'music_provider.g.dart';
 class MusicState {
   const MusicState({
     this.isPlaying = false,
+    this.currentNarration,
     this.currentTrack,
     this.volume = 0.6,
     this.isMuted = false,
@@ -22,7 +23,13 @@ class MusicState {
   });
 
   final bool isPlaying;
+
+  /// URL of the currently active ElevenLabs narration, if any.
+  final String? currentNarration;
+
+  /// URL of the currently active MusicGen ambient/jingle track, if any.
   final String? currentTrack;
+
   final double volume;
   final bool isMuted;
   final bool isGenerating;
@@ -31,6 +38,7 @@ class MusicState {
 
   MusicState copyWith({
     bool? isPlaying,
+    String? currentNarration,
     String? currentTrack,
     double? volume,
     bool? isMuted,
@@ -38,9 +46,11 @@ class MusicState {
     String? generationError,
     List<GeneratedTrack>? generatedTracks,
     bool clearError = false,
+    bool clearNarration = false,
   }) {
     return MusicState(
       isPlaying: isPlaying ?? this.isPlaying,
+      currentNarration: clearNarration ? null : (currentNarration ?? this.currentNarration),
       currentTrack: currentTrack ?? this.currentTrack,
       volume: volume ?? this.volume,
       isMuted: isMuted ?? this.isMuted,
@@ -67,7 +77,7 @@ class GeneratedTrack {
   final DateTime createdAt;
 }
 
-enum GeneratedTrackType { verseHymn, feastDay, questVictory, custom }
+enum GeneratedTrackType { verseNarration, saintVoice, questVictory, ambient }
 
 // ── Repository provider ───────────────────────────────────────────────────────
 
@@ -89,16 +99,16 @@ class MusicNotifier extends _$MusicNotifier {
   MusicState build() {
     _repo = ref.read(musicRepositoryProvider);
 
-    // Auto-play ambient for current liturgical season on first build
+    // Auto-play MusicGen ambient for current liturgical season on first build
     final season = ref.read(currentSeasonProvider);
     _loadSeasonAmbient(season);
 
     return const MusicState(isPlaying: false, volume: 0.6);
   }
 
-  // ── Season ambient ────────────────────────────────────────────────────────────
+  // ── Season ambient (MusicGen via Modal.com) ───────────────────────────────────
 
-  /// Loads and plays ambient music matching the current liturgical season.
+  /// Loads and plays MusicGen ambient music matching the current liturgical season.
   Future<void> _loadSeasonAmbient(LiturgicalSeason season) async {
     final seasonKey = _seasonToKey(season);
     final result = await _repo.getSeasonAmbient(seasonKey);
@@ -113,50 +123,59 @@ class MusicNotifier extends _$MusicNotifier {
     );
   }
 
-  // ── Verse hymn ────────────────────────────────────────────────────────────────
+  // ── Verse narration (ElevenLabs TTS) ─────────────────────────────────────────
 
-  /// Generates a hymn from [verseText] / [verseRef] in the given [style],
-  /// then plays it immediately.
-  Future<void> generateAndPlayVerseHymn({
+  /// Narrates [verseText] / [verseRef] via ElevenLabs TTS and plays it.
+  ///
+  /// When [saintVoiceId] is provided the narration uses that saint's unique
+  /// ElevenLabs voice ID.
+  Future<void> narrateAndPlayVerse({
     required String verseText,
     required String verseRef,
-    String style = 'hymn',
+    String? saintVoiceId,
+    String? saintName,
   }) async {
     state = state.copyWith(isGenerating: true, clearError: true);
-    final result = await _repo.generateVerseHymn(verseText, verseRef, style);
+    final result = await _repo.narrateVerse(
+      verseText,
+      verseRef,
+      saintVoiceId: saintVoiceId,
+    );
     result.fold(
       (failure) {
         state = state.copyWith(isGenerating: false, generationError: failure.message);
       },
       (url) async {
+        final trackTitle = saintName != null
+            ? '$verseRef — narrated by $saintName'
+            : '$verseRef — Narration';
         final track = GeneratedTrack(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          title: '$verseRef Hymn',
+          title: trackTitle,
           audioUrl: url,
-          type: GeneratedTrackType.verseHymn,
+          type: GeneratedTrackType.verseNarration,
           createdAt: DateTime.now(),
         );
-        await _audio.playSunoTrack(url);
+        await _audio.playNarration(url);
         state = state.copyWith(
           isGenerating: false,
           isPlaying: true,
-          currentTrack: url,
+          currentNarration: url,
           generatedTracks: [track, ...state.generatedTracks],
         );
       },
     );
   }
 
-  // ── Feast day song ────────────────────────────────────────────────────────────
+  // ── Saint voice narration (ElevenLabs TTS) ────────────────────────────────────
 
-  /// Generates a feast day song for [saintName] and plays it.
-  Future<void> generateFeastDaySong({
+  /// Narrates [text] using [saintName]'s ElevenLabs voice and plays it.
+  Future<void> narrateWithSaintVoice({
     required String saintName,
-    String patronage = '',
-    String era = 'medieval',
+    required String text,
   }) async {
     state = state.copyWith(isGenerating: true, clearError: true);
-    final result = await _repo.generateFeastDaySong(saintName, patronage, era);
+    final result = await _repo.narrateWithSaintVoice(saintName, text);
     result.fold(
       (failure) {
         state = state.copyWith(isGenerating: false, generationError: failure.message);
@@ -164,47 +183,47 @@ class MusicNotifier extends _$MusicNotifier {
       (url) async {
         final track = GeneratedTrack(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          title: 'Feast of $saintName',
+          title: 'Narrated by $saintName',
           audioUrl: url,
-          type: GeneratedTrackType.feastDay,
+          type: GeneratedTrackType.saintVoice,
           createdAt: DateTime.now(),
         );
-        await _audio.playSunoTrack(url);
+        await _audio.playNarration(url);
         state = state.copyWith(
           isGenerating: false,
           isPlaying: true,
-          currentTrack: url,
+          currentNarration: url,
           generatedTracks: [track, ...state.generatedTracks],
         );
       },
     );
   }
 
-  // ── Victory jingle ────────────────────────────────────────────────────────────
+  // ── Victory jingle (MusicGen via Modal.com) ───────────────────────────────────
 
-  /// Generates and plays a victory jingle for the given [questCategory].
+  /// Generates and plays a MusicGen victory jingle for the given [questCategory].
   Future<void> playQuestVictoryJingle(String questCategory) async {
-    final result = await _repo.generateQuestVictoryJingle(questCategory);
+    final result = await _repo.getVictoryJingle(questCategory);
     result.fold((_) {}, (url) async {
-      await _audio.playSunoTrack(url);
+      await _audio.playNarration(url);
     });
   }
 
   // ── Playback controls ─────────────────────────────────────────────────────────
 
-  /// Plays [url] as a Suno track.
+  /// Plays [url] as a narration track.
   Future<void> playTrack(String url) async {
-    await _audio.playSunoTrack(url);
-    state = state.copyWith(isPlaying: true, currentTrack: url);
+    await _audio.playNarration(url);
+    state = state.copyWith(isPlaying: true, currentNarration: url);
   }
 
-  /// Toggles music on/off (pauses/resumes Suno track; ambient remains as-is).
+  /// Toggles narration on/off (pauses/resumes; ambient remains as-is).
   Future<void> toggleMusic() async {
     if (state.isPlaying) {
-      await _audio.pauseSunoTrack();
+      await _audio.pauseNarration();
       state = state.copyWith(isPlaying: false);
     } else {
-      await _audio.resumeSunoTrack();
+      await _audio.resumeNarration();
       state = state.copyWith(isPlaying: true);
     }
   }

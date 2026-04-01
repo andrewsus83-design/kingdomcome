@@ -9,14 +9,15 @@ import 'package:kingdomcome/core/constants/app_colors.dart';
 import 'package:kingdomcome/core/constants/app_text_styles.dart';
 import 'package:kingdomcome/core/constants/app_spacing.dart';
 import 'package:kingdomcome/presentation/providers/ark_provider.dart';
+import 'package:kingdomcome/presentation/providers/music_provider.dart';
 
 /// Daily Bread — Full-screen daily verse experience.
 ///
 /// Features:
 /// - Beautiful parchment-card with large centered verse text
 /// - Book:Chapter:Verse reference display
-/// - "Read Aloud" button for Suno-generated audio
-/// - Saint narrator card with portrait and name
+/// - "Read Aloud" button for ElevenLabs TTS narration
+/// - Saint narrator card with portrait and name (each saint has a unique voice)
 /// - Reflection prompt with private journal text input
 /// - Share to parish button
 /// - Bread-breaking animation on load
@@ -109,11 +110,27 @@ class _DailyBreadScreenState extends ConsumerState<DailyBreadScreen>
   }
 
   Future<void> _toggleReadAloud(DailyBreadVerse verse) async {
-    setState(() => _isReadingAloud = !_isReadingAloud);
     if (_isReadingAloud) {
-      // In production: play verse.audioUrl using just_audio
-      // For now, simulate with a timer
-      Timer(const Duration(seconds: 8), () {
+      // Stop the current narration
+      setState(() => _isReadingAloud = false);
+      await ref.read(musicNotifierProvider.notifier).toggleMusic();
+      return;
+    }
+
+    setState(() => _isReadingAloud = true);
+
+    // Request ElevenLabs narration through the music provider.
+    // The saint narrator's unique voice ID comes from the verse data.
+    await ref.read(musicNotifierProvider.notifier).narrateAndPlayVerse(
+          verseText: verse.verseText,
+          verseRef: verse.reference,
+          saintVoiceId: verse.narratorSaintName,
+          saintName: verse.narratorSaintName,
+        );
+
+    // Reset the button once narration finishes (best-effort via timer).
+    if (mounted) {
+      Timer(const Duration(seconds: 30), () {
         if (mounted) setState(() => _isReadingAloud = false);
       });
     }
@@ -556,7 +573,7 @@ class _SaintNarratorCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Narrated by',
+                  'Narrated by (ElevenLabs)',
                   style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.midGrey),
                 ),

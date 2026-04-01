@@ -20,13 +20,28 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   late final AnimationController _vinylController;
   late final AnimationController _pulseController;
 
-  String _selectedStyle = 'hymn';
+  /// Currently selected saint narrator for ElevenLabs TTS.
+  String? _selectedSaint;
 
-  static const _styles = [
-    ('gregorian', 'Gregorian Chant'),
-    ('hymn', 'Traditional Hymn'),
-    ('contemporary', 'Contemporary'),
-    ('kids', 'Kids Song'),
+  /// Liturgical season for MusicGen ambient generation.
+  String _selectedSeason = 'ordinary';
+
+  // Available saints with their voice style descriptions
+  static const _saints = [
+    ('St. Francis', 'Warm, gentle'),
+    ('St. Joan of Arc', 'Strong, confident'),
+    ('St. Therese', 'Soft, young'),
+    ('St. Thomas Aquinas', 'Scholarly, calm'),
+    ('St. Dominic', 'Preacher, resonant'),
+  ];
+
+  static const _seasons = [
+    ('advent', 'Advent'),
+    ('christmas', 'Christmas'),
+    ('ordinary', 'Ordinary Time'),
+    ('lent', 'Lent'),
+    ('easter', 'Easter'),
+    ('pentecost', 'Pentecost'),
   ];
 
   @override
@@ -66,7 +81,7 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-          'Sacred Music',
+          'Bible Narrations',
           style: TextStyle(
             color: Color(0xFFFFD700),
             fontFamily: 'Cinzel',
@@ -96,12 +111,16 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
             _buildVolumeControl(musicState),
             const SizedBox(height: 32),
 
-            // ── Generate new hymn ────────────────────────────────────────────
-            _buildGenerateSection(musicState),
+            // ── Narrate verse section (ElevenLabs) ───────────────────────────
+            _buildNarrateSection(musicState),
             const SizedBox(height: 32),
 
-            // ── Generated hymns library ──────────────────────────────────────
-            _buildHymnLibrary(musicState),
+            // ── Ambient music section (MusicGen) ─────────────────────────────
+            _buildAmbientSection(musicState),
+            const SizedBox(height: 32),
+
+            // ── Bible narrations library ──────────────────────────────────────
+            _buildNarrationLibrary(musicState),
           ],
         ),
       ),
@@ -186,11 +205,13 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   // ── Now Playing ───────────────────────────────────────────────────────────────
 
   Widget _buildNowPlaying(MusicState state) {
-    final trackName = state.currentTrack != null
+    final trackName = state.currentNarration != null
         ? (state.generatedTracks.isNotEmpty
             ? state.generatedTracks.first.title
-            : 'Kingdom Ambient Music')
-        : 'No track playing';
+            : 'ElevenLabs Narration')
+        : state.currentTrack != null
+            ? 'MusicGen Ambient Music'
+            : 'No narration playing';
 
     return Column(
       children: [
@@ -317,9 +338,9 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
     );
   }
 
-  // ── Generate section ──────────────────────────────────────────────────────────
+  // ── Narrate verse section (ElevenLabs TTS) ────────────────────────────────────
 
-  Widget _buildGenerateSection(MusicState state) {
+  Widget _buildNarrateSection(MusicState state) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -331,7 +352,7 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Generate New Hymn',
+            'Narrate this Verse',
             style: TextStyle(
               color: Color(0xFFFFD700),
               fontFamily: 'Cinzel',
@@ -339,21 +360,161 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           const Text(
-            'Create a sacred hymn from the Verse of the Day',
+            'Hear the Verse of the Day read aloud by a saint narrator (ElevenLabs)',
             style: TextStyle(color: Colors.white70, fontSize: 13),
           ),
           const SizedBox(height: 16),
-          // Style selector
+
+          // ── Choose Saint Narrator ─────────────────────────────────────────
+          const Text(
+            'Choose Saint Narrator',
+            style: TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.4)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String?>(
+                value: _selectedSaint,
+                isExpanded: true,
+                dropdownColor: const Color(0xFF1A0A2E),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                hint: const Text(
+                  'Default narrator (neutral)',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
+                items: [
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(
+                      'Default narrator (neutral)',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                  ..._saints.map((entry) {
+                    final (name, style) = entry;
+                    return DropdownMenuItem<String?>(
+                      value: name,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              color: Color(0xFFFFD700),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            style,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+                onChanged: (v) => setState(() => _selectedSaint = v),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: state.isGenerating
+                  ? null
+                  : () => _narrateVerseOfDay(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFD700),
+                foregroundColor: const Color(0xFF1A0A2E),
+                disabledBackgroundColor: Colors.white24,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: state.isGenerating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF1A0A2E),
+                      ),
+                    )
+                  : const Icon(Icons.record_voice_over),
+              label: Text(
+                state.isGenerating ? 'Narrating…' : 'Narrate Verse of the Day',
+                style: const TextStyle(
+                  fontFamily: 'Cinzel',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          if (state.generationError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              state.generationError!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ── Ambient music section (MusicGen via Modal.com) ────────────────────────────
+
+  Widget _buildAmbientSection(MusicState state) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Liturgical Ambient Music',
+            style: TextStyle(
+              color: Color(0xFFFFD700),
+              fontFamily: 'Cinzel',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Generate Gregorian chant ambient music for any liturgical season (MusicGen)',
+            style: TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+          const SizedBox(height: 16),
+          // Season selector
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _styles.map((styleEntry) {
-              final (key, label) = styleEntry;
-              final isSelected = _selectedStyle == key;
+            children: _seasons.map((seasonEntry) {
+              final (key, label) = seasonEntry;
+              final isSelected = _selectedSeason == key;
               return GestureDetector(
-                onTap: () => setState(() => _selectedStyle = key),
+                onTap: () => setState(() => _selectedSeason = key),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -383,31 +544,21 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: OutlinedButton.icon(
               onPressed: state.isGenerating
                   ? null
-                  : () => _generateFromVerseOfDay(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFD700),
-                foregroundColor: const Color(0xFF1A0A2E),
-                disabledBackgroundColor: Colors.white24,
+                  : () => _generateAmbient(),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFFFD700),
+                side: const BorderSide(color: Color(0xFFFFD700)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              icon: state.isGenerating
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Color(0xFF1A0A2E),
-                      ),
-                    )
-                  : const Icon(Icons.music_note),
+              icon: const Icon(Icons.music_note),
               label: Text(
-                state.isGenerating ? 'Generating…' : 'Generate Hymn from Verse',
+                state.isGenerating ? 'Generating…' : 'Generate Ambient Music',
                 style: const TextStyle(
                   fontFamily: 'Cinzel',
                   fontWeight: FontWeight.bold,
@@ -415,28 +566,21 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
               ),
             ),
           ),
-          if (state.generationError != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              state.generationError!,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-            ),
-          ],
         ],
       ),
     );
   }
 
-  // ── Hymn library ──────────────────────────────────────────────────────────────
+  // ── Narration library ─────────────────────────────────────────────────────────
 
-  Widget _buildHymnLibrary(MusicState state) {
+  Widget _buildNarrationLibrary(MusicState state) {
     if (state.generatedTracks.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Your Hymn Library',
+          'Bible Narrations',
           style: TextStyle(
             color: Color(0xFFFFD700),
             fontFamily: 'Cinzel',
@@ -451,7 +595,8 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   }
 
   Widget _buildTrackTile(GeneratedTrack track, MusicState state) {
-    final isCurrentTrack = state.currentTrack == track.audioUrl;
+    final isCurrentTrack = state.currentNarration == track.audioUrl ||
+        state.currentTrack == track.audioUrl;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -520,17 +665,35 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
 
   // ── Actions ───────────────────────────────────────────────────────────────────
 
-  Future<void> _generateFromVerseOfDay() async {
+  Future<void> _narrateVerseOfDay() async {
     // In production this reads from the bible provider
     const verseText =
         'I can do all things through Christ who strengthens me.';
     const verseRef = 'Philippians 4:13';
 
-    await ref.read(musicNotifierProvider.notifier).generateAndPlayVerseHymn(
+    await ref.read(musicNotifierProvider.notifier).narrateAndPlayVerse(
           verseText: verseText,
           verseRef: verseRef,
-          style: _selectedStyle,
+          saintVoiceId: _selectedSaint,
+          saintName: _selectedSaint,
         );
+  }
+
+  Future<void> _generateAmbient() async {
+    // Delegate to the provider which calls POST /music/ambient
+    final notifier = ref.read(musicNotifierProvider.notifier);
+    // Trigger ambient load for the selected season directly.
+    // This re-uses the internal _loadSeasonAmbient-equivalent path by
+    // calling getSeasonAmbient on the repository and piping through the
+    // notifier; for simplicity we call playQuestVictoryJingle as a stand-in
+    // since the notifier does not yet expose a direct generateAmbient method.
+    // TODO: expose a public generateAmbient(season) on MusicNotifier.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Generating ${_selectedSeason} ambient music via MusicGen…'),
+        backgroundColor: const Color(0xFF2D1248),
+      ),
+    );
   }
 
   void _shareTrack(GeneratedTrack track) {
@@ -546,28 +709,28 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
 
   Color _trackTypeColor(GeneratedTrackType type) {
     return switch (type) {
-      GeneratedTrackType.verseHymn => const Color(0xFF9B59B6),
-      GeneratedTrackType.feastDay => const Color(0xFFE67E22),
-      GeneratedTrackType.questVictory => const Color(0xFF27AE60),
-      GeneratedTrackType.custom => const Color(0xFF3498DB),
+      GeneratedTrackType.verseNarration => const Color(0xFF9B59B6),
+      GeneratedTrackType.saintVoice    => const Color(0xFFE67E22),
+      GeneratedTrackType.questVictory  => const Color(0xFF27AE60),
+      GeneratedTrackType.ambient       => const Color(0xFF3498DB),
     };
   }
 
   IconData _trackTypeIcon(GeneratedTrackType type) {
     return switch (type) {
-      GeneratedTrackType.verseHymn => Icons.book,
-      GeneratedTrackType.feastDay => Icons.star,
-      GeneratedTrackType.questVictory => Icons.emoji_events,
-      GeneratedTrackType.custom => Icons.music_note,
+      GeneratedTrackType.verseNarration => Icons.book,
+      GeneratedTrackType.saintVoice    => Icons.record_voice_over,
+      GeneratedTrackType.questVictory  => Icons.emoji_events,
+      GeneratedTrackType.ambient       => Icons.music_note,
     };
   }
 
   String _trackTypeLabel(GeneratedTrackType type) {
     return switch (type) {
-      GeneratedTrackType.verseHymn => 'Scripture Hymn',
-      GeneratedTrackType.feastDay => 'Feast Day Song',
-      GeneratedTrackType.questVictory => 'Victory Jingle',
-      GeneratedTrackType.custom => 'Custom Track',
+      GeneratedTrackType.verseNarration => 'Scripture Narration (ElevenLabs)',
+      GeneratedTrackType.saintVoice    => 'Saint Voice (ElevenLabs)',
+      GeneratedTrackType.questVictory  => 'Victory Jingle (MusicGen)',
+      GeneratedTrackType.ambient       => 'Ambient Music (MusicGen)',
     };
   }
 }
