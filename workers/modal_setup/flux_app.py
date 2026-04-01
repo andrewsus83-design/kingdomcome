@@ -39,7 +39,7 @@ image = (
         "apt-get update -y && apt-get install -y --no-install-recommends git",
         "pip install --upgrade pip",
         "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121",
-        "pip install diffusers transformers accelerate sentencepiece protobuf",
+        "pip install diffusers transformers accelerate sentencepiece protobuf fastapi[standard]",
     )
 )
 

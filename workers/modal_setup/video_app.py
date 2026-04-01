@@ -39,7 +39,7 @@ image = (
         "apt-get update -y && apt-get install -y --no-install-recommends "
         "ffmpeg curl wget ca-certificates",
         "pip install --upgrade pip",
-        "pip install requests",
+        "pip install requests fastapi[standard]",
     )
 )
 
