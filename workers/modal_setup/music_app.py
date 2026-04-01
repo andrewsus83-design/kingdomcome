@@ -8,16 +8,15 @@ import modal
 
 app = modal.App("kingdom-come-music")
 
-# Use PyTorch CUDA base image — avoids torch version conflicts with audiocraft
 image = (
     modal.Image.from_registry(
         "pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime",
         add_python="3.11",
     )
+    .apt_install("ffmpeg", "libavcodec-dev", "libavformat-dev", "libavutil-dev")
     .run_commands(
         "pip install --upgrade pip",
         "pip install audiocraft",
-        "pip install scipy",
     )
 )
 
