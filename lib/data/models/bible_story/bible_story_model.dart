@@ -103,8 +103,8 @@ class BibleStoryModel extends Equatable {
       holyPointsReward: json['holy_points_reward'] as int? ?? 0,
       isLocked: json['is_locked'] as bool? ?? false,
       requiredBuildingType: json['required_building_type'] != null
-          ? BuildingType.values
-              .byName(json['required_building_type'] as String)
+          ? BuildingType.fromDatabaseValue(
+              json['required_building_type'] as String)
           : null,
     );
   }

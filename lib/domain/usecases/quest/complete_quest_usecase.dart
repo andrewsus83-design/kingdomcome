@@ -164,7 +164,7 @@ class CompleteQuestUseCase {
         bool streakAdvanced = false;
         final streakResult = await _streakRepository.recordActivity(
           params.userId,
-          StreakType.general,
+          StreakType.dailyQuest,
         );
         streakResult.fold(
           (_) => null, // Non-fatal: streak update failure doesn't block completion.

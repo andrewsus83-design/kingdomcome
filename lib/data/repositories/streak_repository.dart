@@ -47,10 +47,10 @@ class StreakRepositoryImpl implements StreakRepository {
   ) async {
     try {
       final data = await _client
-          .from('streaks')
+          .from('user_streaks')
           .select()
           .eq('user_id', userId)
-          .eq('streak_type', streakType.name)
+          .eq('streak_type', streakType.databaseKey)
           .single();
 
       return Right(StreakModel.fromJson(data));
@@ -60,7 +60,7 @@ class StreakRepositoryImpl implements StreakRepository {
         return Right(
           StreakModel(
             userId: userId,
-            streakType: streakType,
+            type: streakType,
             currentStreak: 0,
             longestStreak: 0,
           ),
@@ -89,7 +89,7 @@ class StreakRepositoryImpl implements StreakRepository {
         'record-streak-activity',
         body: {
           'user_id': userId,
-          'streak_type': streakType.name,
+          'streak_type': streakType.databaseKey,
         },
       );
 
@@ -121,14 +121,10 @@ class StreakRepositoryImpl implements StreakRepository {
     StreakType streakType,
   ) async {
     try {
-      await _client.from('streaks').upsert(
-        {
-          'user_id': userId,
-          'streak_type': streakType.name,
-          'has_streak_shield': true,
-        },
-        onConflict: 'user_id,streak_type',
-      );
+      await _client.rpc('activate_streak_shield', params: {
+        'p_user_id': userId,
+        'p_streak_type': streakType.databaseKey,
+      });
       return const Right(null);
     } on PostgrestException catch (e) {
       return Left(GameFailure(message: e.message, code: e.code));

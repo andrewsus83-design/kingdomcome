@@ -133,7 +133,7 @@ class AcademyScreen extends ConsumerWidget {
     final streaksAsync = ref.watch(streakNotifierProvider);
     final streaks = streaksAsync.valueOrNull ?? [];
     final loginStreak = streaks
-        .where((s) => s.type == StreakType.login)
+        .where((s) => s.type == StreakType.dailyQuest)
         .fold(0, (_, s) => s.currentStreak);
 
     // Player level — derive from XP or default to 1 for demo

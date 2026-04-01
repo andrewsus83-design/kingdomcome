@@ -72,7 +72,7 @@ class ArtsRepositoryImpl implements ArtsRepository {
             'id': id,
             'user_id': userId,
             'title': 'My ${artworkType.displayName}',
-            'artwork_type': artworkType.name,
+            'artwork_type': artworkType.databaseKey,
             'canvas_data': canvasData,
             'is_displayed_in_kingdom': false,
             'holy_points_earned': 0,

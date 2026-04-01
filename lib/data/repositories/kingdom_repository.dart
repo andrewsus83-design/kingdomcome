@@ -114,7 +114,7 @@ class KingdomRepositoryImpl implements KingdomRepository {
         'build-structure',
         body: {
           'kingdom_id': kingdomId,
-          'building_type': buildingType.name,
+          'building_type': buildingType.databaseValue,
           'grid_x': gridX,
           'grid_y': gridY,
         },

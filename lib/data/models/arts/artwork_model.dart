@@ -20,6 +20,31 @@ extension ArtworkTypeX on ArtworkType {
         return 'Banner';
     }
   }
+
+  /// Maps to a valid DB `artwork_type` enum value.
+  String get databaseKey {
+    switch (this) {
+      case ArtworkType.stainedGlass:
+        return 'other';
+      case ArtworkType.manuscript:
+        return 'calligraphy';
+      case ArtworkType.mosaic:
+        return 'other';
+      case ArtworkType.banner:
+        return 'craft';
+    }
+  }
+
+  static ArtworkType fromDatabaseValue(String value) {
+    switch (value) {
+      case 'calligraphy':
+        return ArtworkType.manuscript;
+      case 'craft':
+        return ArtworkType.banner;
+      default:
+        return ArtworkType.stainedGlass;
+    }
+  }
 }
 
 class ArtworkModel extends Equatable {
@@ -60,7 +85,7 @@ class ArtworkModel extends Equatable {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       title: json['title'] as String,
-      artworkType: ArtworkType.values.byName(json['artwork_type'] as String),
+      artworkType: ArtworkTypeX.fromDatabaseValue(json['artwork_type'] as String? ?? 'other'),
       canvasData: (json['canvas_data'] as Map<String, dynamic>?) ?? {},
       thumbnailUrl: json['thumbnail_url'] as String?,
       isDisplayedInKingdom: json['is_displayed_in_kingdom'] as bool? ?? false,
@@ -77,7 +102,7 @@ class ArtworkModel extends Equatable {
       'id': id,
       'user_id': userId,
       'title': title,
-      'artwork_type': artworkType.name,
+      'artwork_type': artworkType.databaseKey,
       'canvas_data': canvasData,
       'thumbnail_url': thumbnailUrl,
       'is_displayed_in_kingdom': isDisplayedInKingdom,

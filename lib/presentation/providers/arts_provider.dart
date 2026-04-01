@@ -49,7 +49,7 @@ class ArtsNotifier extends _$ArtsNotifier {
         .insert({
           'user_id': user.id,
           'title': artworkTitle,
-          'artwork_type': type.name,
+          'artwork_type': type.databaseKey,
           'canvas_data': canvasData,
           'is_displayed_in_kingdom': false,
           'holy_points_earned': _holyPointsForArtwork(type),
@@ -107,7 +107,7 @@ class ArtsNotifier extends _$ArtsNotifier {
         .insert({
           'user_id': user.id,
           'title': 'AI ${type.displayName} — ${prompt.substring(0, prompt.length.clamp(0, 30))}',
-          'artwork_type': type.name,
+          'artwork_type': type.databaseKey,
           'canvas_data': {'ai_generated': true, 'prompt': prompt},
           'thumbnail_url': imageUrl,
           'is_displayed_in_kingdom': false,
