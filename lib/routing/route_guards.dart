@@ -53,7 +53,7 @@ final playerLevelProvider = Provider<int>((ref) {
 ///
 /// Evaluated on every navigation event. Returns null to allow the navigation,
 /// or a redirect path string to override it.
-String? appRedirect(BuildContext context, GoRouterState state, WidgetRef ref) {
+String? appRedirect(BuildContext context, GoRouterState state, Ref ref) {
   final location = state.uri.toString();
 
   // ── Auth guard ──────────────────────────────────────────────────────────
