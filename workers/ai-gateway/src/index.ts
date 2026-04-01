@@ -3,34 +3,33 @@
  *
  * Routes AI requests to the appropriate upstream service:
  *   POST /chat                        → Magisterium AI (Catholic chat)
- *   POST /analyze-artwork             → Claude Vision API (Masterpiece Scanner)
  *   POST /generate-image              → Modal.com Flux Schnell (arts & crafts)
- *   POST /generate-character          → Returns asset URL from R2 (characters uploaded manually)
+ *   POST /generate-character          → OpenArt AI (saint/character art)
  *   POST /generate-video              → Runway Gen 4.5 (Bible story videos)
  *   POST /create-avatar-video         → HeyGen API (avatar storyteller)
  *   POST /orchestrate                 → Claude API (Anthropic, complex workflows)
  *   GET  /wiki/:articleId             → World Anvil API (wiki content)
- *   POST /music/generate              → Modal.com MusicGen (custom hymn/music generation)
- *   POST /music/generate-from-verse   → Modal.com MusicGen (verse-to-hymn)
- *   POST /music/feast-day-song        → Modal.com MusicGen (feast day song)
- *   GET  /music/kingdom-ambient/:season → Modal.com MusicGen (liturgical ambient music)
- *   POST /narrate                     → Modal.com Bark TTS (narration)
+ *   POST /audio/narrate-verse         → ElevenLabs TTS (Bible verse read-aloud)
+ *   POST /audio/narrate-story         → ElevenLabs TTS (Bible story panel narration)
+ *   POST /audio/saint-voice           → ElevenLabs TTS (saint narrator voices)
+ *   POST /music/ambient               → MusicGen via Modal.com (liturgical ambient)
+ *   POST /music/victory-jingle        → MusicGen via Modal.com (quest victory jingle)
  */
 
 import { filterResponse, validateChatRequest } from "./content-filter";
-import { handleAudioRequest } from "./audio";
+import { handleAudioRequest } from "./suno";
 
 // ── Env bindings ─────────────────────────────────────────────────────────────
 
 export interface Env {
   MAGISTERIUM_API_KEY: string;
   ANTHROPIC_API_KEY: string;
+  OPENART_API_KEY: string;
   MODAL_API_KEY: string;
   RUNWAY_API_KEY: string;
   HEYGEN_API_KEY: string;
   WORLD_ANVIL_API_KEY: string;
-  MODAL_TTS_URL: string;
-  MODAL_MUSIC_URL: string;
+  ELEVENLABS_API_KEY: string;
 }
 
 // ── Rate limiting (in-memory per isolate — coarse guard) ──────────────────────
@@ -168,37 +167,30 @@ export default {
       return handleWiki(wikiMatch[1], env);
     }
 
-    // ── Modal audio routes (MusicGen + Bark TTS) ──────────────────────────────
+    // ── Audio / Music routes (ElevenLabs TTS + MusicGen) ─────────────────────
 
-    // POST /music/generate
-    if (pathname === "/music/generate" && request.method === "POST") {
+    // POST /audio/narrate-verse
+    if (pathname === "/audio/narrate-verse" && request.method === "POST") {
       return handleAudioRequest(request, env);
     }
 
-    // POST /music/generate-from-verse
-    if (pathname === "/music/generate-from-verse" && request.method === "POST") {
+    // POST /audio/narrate-story
+    if (pathname === "/audio/narrate-story" && request.method === "POST") {
       return handleAudioRequest(request, env);
     }
 
-    // POST /music/feast-day-song
-    if (pathname === "/music/feast-day-song" && request.method === "POST") {
+    // POST /audio/saint-voice
+    if (pathname === "/audio/saint-voice" && request.method === "POST") {
       return handleAudioRequest(request, env);
     }
 
-    // GET /music/kingdom-ambient/:season
-    const ambientMatch = pathname.match(/^\/music\/kingdom-ambient\/([^/]+)$/);
-    if (ambientMatch && request.method === "GET") {
+    // POST /music/ambient
+    if (pathname === "/music/ambient" && request.method === "POST") {
       return handleAudioRequest(request, env);
     }
 
-    // POST /music/quest-victory/:category
-    const questMatch = pathname.match(/^\/music\/quest-victory\/([^/]+)$/);
-    if (questMatch && request.method === "POST") {
-      return handleAudioRequest(request, env);
-    }
-
-    // POST /narrate
-    if (pathname === "/narrate" && request.method === "POST") {
+    // POST /music/victory-jingle
+    if (pathname === "/music/victory-jingle" && request.method === "POST") {
       return handleAudioRequest(request, env);
     }
 
@@ -487,20 +479,41 @@ async function handleGenerateCharacter(
     return jsonError("Invalid JSON body.");
   }
 
-  // Saint character assets are uploaded manually to R2/Supabase Storage.
-  // This endpoint returns the asset URL based on saint name slug.
   const saintName = typeof body.saintName === "string" ? body.saintName.trim() : "";
+  const style = typeof body.style === "string" ? body.style : "icon painting";
   if (!saintName) return jsonError("Field 'saintName' is required.");
 
-  const slug = saintName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-  const assetUrl = `https://assets.kingdomcome.app/saints/${slug}.png`;
+  const prompt =
+    `Portrait of ${saintName}, Catholic saint, ${style}, holy nimbus, ` +
+    `medieval iconography, gold leaf, rich colors, sacred art, child-friendly`;
 
-  return jsonOk({
-    imageUrl: assetUrl,
-    saintName,
-    slug,
-    note: "Character art uploaded manually. Replace URL once assets are ready.",
-  });
+  try {
+    const openArtResponse = await fetch("https://openart.ai/api/v1/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.OPENART_API_KEY}`,
+      },
+      body: JSON.stringify({
+        prompt,
+        negative_prompt: "violent, scary, inappropriate, modern, photorealistic",
+        width: 512,
+        height: 512,
+        num_images: 1,
+        model: "openart-xl",
+      }),
+    });
+
+    if (!openArtResponse.ok) {
+      return jsonError("Character generation service temporarily unavailable.", 502);
+    }
+
+    const data = await openArtResponse.json();
+    return jsonOk(data);
+  } catch (err) {
+    console.error("Character generation error:", err);
+    return jsonError("Internal server error.", 500);
+  }
 }
 
 async function handleGenerateVideo(
