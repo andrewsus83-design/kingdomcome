@@ -1,9 +1,13 @@
 import 'package:equatable/equatable.dart';
 
+// DB user_streaks.streak_type values:
+// 'daily_quest', 'prayer', 'bible_reading', 'rosary', 'mass'
 enum StreakType {
   prayer,
-  bible,
-  general,
+  bibleReading,
+  rosary,
+  mass,
+  dailyQuest,
 }
 
 extension StreakTypeX on StreakType {
@@ -11,119 +15,125 @@ extension StreakTypeX on StreakType {
     switch (this) {
       case StreakType.prayer:
         return 'Prayer Streak';
-      case StreakType.bible:
-        return 'Bible Streak';
-      case StreakType.general:
-        return 'Daily Streak';
+      case StreakType.bibleReading:
+        return 'Bible Reading Streak';
+      case StreakType.rosary:
+        return 'Rosary Streak';
+      case StreakType.mass:
+        return 'Mass Streak';
+      case StreakType.dailyQuest:
+        return 'Daily Quest Streak';
     }
+  }
+
+  String get databaseKey {
+    switch (this) {
+      case StreakType.prayer:
+        return 'prayer';
+      case StreakType.bibleReading:
+        return 'bible_reading';
+      case StreakType.rosary:
+        return 'rosary';
+      case StreakType.mass:
+        return 'mass';
+      case StreakType.dailyQuest:
+        return 'daily_quest';
+    }
+  }
+
+  static StreakType fromDatabaseValue(String value) {
+    return StreakType.values.firstWhere(
+      (t) => t.databaseKey == value,
+      orElse: () => StreakType.prayer,
+    );
   }
 }
 
 class StreakModel extends Equatable {
   final String userId;
-  final StreakType streakType;
+  final StreakType type;
   final int currentStreak;
   final int longestStreak;
-
-  /// The most recent date on which this streak was completed (date only, no time).
-  final DateTime? lastCompletedDate;
-
-  /// Ordered list of dates when this streak was completed (up to 90 days).
-  final List<DateTime> completionHistory;
-
-  /// When true, the next missed day will not break the streak.
-  final bool hasStreakShield;
+  final DateTime? lastActivityAt;
+  final bool shieldActive;
+  final DateTime? shieldExpiresAt;
 
   const StreakModel({
     required this.userId,
-    required this.streakType,
+    required this.type,
     required this.currentStreak,
     required this.longestStreak,
-    this.lastCompletedDate,
-    this.completionHistory = const [],
-    this.hasStreakShield = false,
+    this.lastActivityAt,
+    this.shieldActive = false,
+    this.shieldExpiresAt,
   });
 
-  /// True when the streak has been recorded on today's date.
   bool get isActiveToday {
-    if (lastCompletedDate == null) return false;
-    final today = _dateOnly(DateTime.now());
-    final last = _dateOnly(lastCompletedDate!);
-    return today == last;
+    if (lastActivityAt == null) return false;
+    final now = DateTime.now();
+    final last = lastActivityAt!;
+    return last.year == now.year &&
+        last.month == now.month &&
+        last.day == now.day;
   }
 
-  /// True when the streak has NOT been completed today but was completed
-  /// yesterday, meaning it will break at midnight if not recorded.
-  bool get isAtRisk {
-    if (lastCompletedDate == null) return false;
-    if (isActiveToday) return false;
-    final yesterday = _dateOnly(DateTime.now().subtract(const Duration(days: 1)));
-    final last = _dateOnly(lastCompletedDate!);
-    return last == yesterday && currentStreak > 0;
-  }
-
-  static DateTime _dateOnly(DateTime dt) =>
-      DateTime(dt.year, dt.month, dt.day);
+  bool get isAtRisk => !isActiveToday && !shieldActive;
 
   factory StreakModel.fromJson(Map<String, dynamic> json) {
     return StreakModel(
-      userId: json['user_id'] as String,
-      streakType: StreakType.values.byName(json['streak_type'] as String),
+      userId: json['user_id'] as String? ?? '',
+      type: StreakTypeX.fromDatabaseValue(
+          json['streak_type'] as String? ?? 'prayer'),
       currentStreak: json['current_streak'] as int? ?? 0,
       longestStreak: json['longest_streak'] as int? ?? 0,
-      lastCompletedDate: json['last_completed_date'] != null
-          ? DateTime.parse(json['last_completed_date'] as String)
+      lastActivityAt: json['last_completed_date'] != null
+          ? DateTime.tryParse(json['last_completed_date'] as String)
+          : json['last_activity_at'] != null
+              ? DateTime.tryParse(json['last_activity_at'] as String)
+              : null,
+      shieldActive: json['shield_active'] as bool? ?? false,
+      shieldExpiresAt: json['shield_expires_at'] != null
+          ? DateTime.tryParse(json['shield_expires_at'] as String)
           : null,
-      completionHistory:
-          (json['completion_history'] as List<dynamic>?)
-                  ?.map((d) => DateTime.parse(d as String))
-                  .toList() ??
-              [],
-      hasStreakShield: json['has_streak_shield'] as bool? ?? false,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'user_id': userId,
-      'streak_type': streakType.name,
-      'current_streak': currentStreak,
-      'longest_streak': longestStreak,
-      'last_completed_date': lastCompletedDate?.toIso8601String(),
-      'completion_history':
-          completionHistory.map((d) => d.toIso8601String()).toList(),
-      'has_streak_shield': hasStreakShield,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'user_id': userId,
+        'streak_type': type.databaseKey,
+        'current_streak': currentStreak,
+        'longest_streak': longestStreak,
+        'last_activity_at': lastActivityAt?.toIso8601String(),
+        'shield_active': shieldActive,
+        'shield_expires_at': shieldExpiresAt?.toIso8601String(),
+      };
 
   StreakModel copyWith({
-    String? userId,
-    StreakType? streakType,
     int? currentStreak,
     int? longestStreak,
-    DateTime? lastCompletedDate,
-    List<DateTime>? completionHistory,
-    bool? hasStreakShield,
+    DateTime? lastActivityAt,
+    bool? shieldActive,
+    DateTime? shieldExpiresAt,
   }) {
     return StreakModel(
-      userId: userId ?? this.userId,
-      streakType: streakType ?? this.streakType,
+      userId: userId,
+      type: type,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
-      lastCompletedDate: lastCompletedDate ?? this.lastCompletedDate,
-      completionHistory: completionHistory ?? this.completionHistory,
-      hasStreakShield: hasStreakShield ?? this.hasStreakShield,
+      lastActivityAt: lastActivityAt ?? this.lastActivityAt,
+      shieldActive: shieldActive ?? this.shieldActive,
+      shieldExpiresAt: shieldExpiresAt ?? this.shieldExpiresAt,
     );
   }
 
   @override
   List<Object?> get props => [
         userId,
-        streakType,
+        type,
         currentStreak,
         longestStreak,
-        lastCompletedDate,
-        completionHistory,
-        hasStreakShield,
+        lastActivityAt,
+        shieldActive,
+        shieldExpiresAt,
       ];
 }
