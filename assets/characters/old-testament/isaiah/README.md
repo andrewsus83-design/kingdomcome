@@ -1,30 +1,31 @@
 # ISAIAH
 **Testament:** Old Testament
-**Book(s):** Isaiah; Matthew 1; 3–4; 8; 12–13; Luke 3–4; Acts 8
-**Era:** Divided Kingdom / Assyrian Period (~740–700 BC)
-**Role:** Prophet — Messianic Prophet
+**Book(s):** Isaiah 1–66; Matthew 1; 3–4; 8; 12; Luke 3–4; Acts 8; Romans 10
+**Era:** Divided Kingdom / Assyrian Period (~750–700 BC)
+**Role:** Prophet of the Messiah — Prince of Prophets
 **Rarity:** Legendary
 
 ## Description
-Isaiah is called the "Prince of Prophets" because he wrote more clearly about Jesus — the coming Messiah — than any other Old Testament prophet. Over 700 years before Jesus was born, Isaiah described the Virgin Birth, the suffering servant, and the crucifixion in extraordinary detail. He saw a magnificent vision of heaven's throne room with six-winged seraphim crying "Holy, Holy, Holy," and when a burning coal touched his lips he was purified and sent to proclaim God's word to the nations.
+Isaiah is called the "Prince of Prophets" and the "Fifth Evangelist" because he wrote about Jesus — the coming Messiah — more clearly and in more detail than any other Old Testament prophet, over 700 years before Jesus was born. He prophesied the Virgin Birth ("a virgin shall conceive and bear a son"), the ministry of John the Baptist ("a voice crying in the wilderness"), the triumphal entry, the suffering servant who was "pierced for our transgressions," and the resurrection — all with breathtaking precision. Isaiah's magnificent vision of God's throne room, where six-winged seraphim cry "Holy, Holy, Holy," and where a burning coal purified his lips for prophetic service, is one of the most awe-inspiring encounters with God recorded anywhere in Scripture.
 
 ## Game Stats
 - **Virtue:** Holy Vision
-- **Special Ability:** A Child Is Born — Unlocks all Nativity and Christmas seasonal event bonuses instantly, golden star fills the sky
+- **Special Ability:** A Child Is Born — Isaiah unrolls his glowing scroll and proclaims the Messianic prophecy aloud; a brilliant golden star blazes into the sky above the kingdom, instantly activating all special seasonal and Nativity event bonuses, granting all allied units a 40-second divine blessing aura, and filling the entire screen with a golden sunrise of prophetic light.
+- **Passive Bonus:** Eyes That See — Isaiah's presence gives all allied units prophetic foresight; all enemy attack patterns are revealed one full turn in advance, and all hidden enemy reinforcements are automatically detected, reflecting the prophet who could see seven centuries into the future with perfect clarity.
 - **Unlock Cost:** 5000 HolyPoints
 - **Required Building:** Cathedral Level 5
 
 ## OpenArt Prompt
 **POSITIVE:**
-Semi-cartoon Pixar-style 3D rendered character illustration, Catholic mobile game hero card, Isaiah the messianic prophet. Noble and visionary older man with silver hair and beard, penetrating prophetic eyes that seem to see centuries into the future, warm olive skin, an expression of awestruck holy wonder. Wearing magnificent prophet's robes — a deep royal blue robe with gold embroidered stars and flames at the hem, a white linen inner robe, simple leather sandals. He holds a glowing golden scroll partially unrolled with luminous Hebrew text. Above him a spectacular vision of heaven — six-winged golden seraphim fly around a blazing throne of light with rays of glory streaming downward. A burning golden coal on golden tongs hovers near his lips. Stars blaze in the heavenly scene above. Blazing golden halo shines brilliantly from his head. Background: heavenly vision blending with the earthly temple of Jerusalem below. Warm rich biblical color palette, clean cel-shaded digital art, mobile game hero card illustration, sacred art aesthetic, age-appropriate 8-18.
+Semi-cartoon Pixar-style 3D rendered character illustration, Catholic mobile game hero card, Isaiah the messianic prophet and prince of prophets. Noble visionary older man with silver hair swept back dramatically and a distinguished silver beard, penetrating prophetic eyes blazing with holy light as if they actually see into another century, warm olive skin, and an expression of utterly awestruck holy wonder as if beholding something that makes the ordinary world look dim. Wearing magnificent prophet's robes — a deep royal blue outer robe with golden stars and tongues of flame embroidered along the hem, a pure white linen inner robe, simple leather sandals. He holds a glowing golden scroll partially unrolled in both hands, covered with luminous Hebrew text that radiates prophetic light. Above him a spectacular heavenly vision blazes — two six-winged golden seraphim fly around a blazing throne of divine light, their faces covered by two wings, feet covered by two wings, and flying with two, crying "Holy, Holy, Holy" as rays of golden glory stream downward toward Isaiah. A golden coal on ornate golden tongs hovers near his lips, representing his purification for prophetic service. A blazing golden halo shines brilliantly from his head. Heavenly gold, royal blue, and white color palette, clean cel-shaded digital art, mobile game hero card illustration, sacred art aesthetic, age-appropriate 8–18.
 
 **NEGATIVE:**
 photorealistic, scary, dark, violent, adult content, ugly, deformed, blurry, modern clothing, inappropriate, horror, watermark
 
 ## Character Attributes (Symbols to include in art)
-- Glowing prophetic scroll with Hebrew text
-- Six-winged seraphim visible in heavenly vision above
-- Burning coal on golden tongs (purification of his lips)
+- Glowing prophetic scroll — symbol of the 66-chapter book that predicted the Messiah's birth, life, death, and resurrection in precise detail
+- Six-winged golden seraphim in a heavenly vision above — symbol of his throne-room vision where he saw God's holiness face to face (Isaiah 6:1–3)
+- Burning golden coal on tongs near his lips — symbol of his purification for prophetic service when God touched his unclean lips (Isaiah 6:6–7)
 
 ## Image Files Needed
 Place these files in this folder:

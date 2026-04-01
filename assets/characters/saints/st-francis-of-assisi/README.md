@@ -2,39 +2,39 @@
 **Category:** Saints
 **Feast Day:** October 4
 **Era:** 13th Century (1181–1226)
-**Origin:** Assisi, Italy
-**Patronage:** Animals, ecology, merchants, Italy, peace
+**Origin:** Assisi, Umbria, Italy
+**Patronage:** Animals, ecology, merchants, Italy, peace, environmental stewards
 **Rarity:** Legendary
 
 ## Description
-Francis of Assisi was a wealthy merchant's son who gave up everything to live in radical poverty and follow Jesus completely. He founded the Franciscan Order, preached to birds and animals, and received the stigmata — the wounds of Christ — on his body. Kids love him because he showed that true joy comes from giving, not getting, and that God's creation — every creature, every blade of grass — is a gift worth protecting.
+Francis of Assisi was a wealthy cloth merchant's son who loved parties, fine clothes, and fame — until a moment of grace in a crumbling chapel where he heard Christ say "rebuild my Church," and he gave away every possession he had, including the clothes off his back, to follow Jesus in total poverty. He founded the Franciscan Order, preached to flocks of birds as if they were his brothers and sisters, negotiated peace between warring kingdoms, and received the stigmata — the actual wounds of Christ in his hands, feet, and side — two years before he died. Kids love Francis because he was wild, joyful, creative, and fearless, and he proved that the most radical thing a human being can do is love everything God made.
 
 ## Game Stats
 - **Virtue:** Humility
-- **Special Ability:** God's Creatures — All resource gathering in the Kingdom is doubled for 2 hours. Nature zones, gardens, and animal companions yield double rewards. Activate when you need to stock up on building materials, food, or nature-based crafting supplies.
-- **Passive Bonus:** Animals in your Kingdom never flee and always yield +1 bonus resource when interacted with.
+- **Special Ability:** God's Creatures — Francis spreads his arms wide and every bird, animal, and nature creature in the kingdom responds with a joyful cascade of resources; all resource gathering from nature zones, gardens, forests, and animal companions is doubled for 2 full hours, with colorful songbirds and woodland animals visibly streaming across the kingdom map delivering bonus materials in their beaks and paws.
+- **Passive Bonus:** Animals in your kingdom never flee and always yield +1 bonus resource when interacted with, and all ecology and nature-care quests reward +15% extra grace while Francis is your active guardian.
 - **Unlock Cost:** 2,500 HolyPoints
 - **Required Monastery Level:** 8
 
 ## OpenArt Prompt
 **POSITIVE:**
-Pixar-style 3D rendered character, St. Francis of Assisi, joyful young man with warm brown eyes and a kind smile, wearing a rough-hewn brown Franciscan habit tied with a simple white rope cord, barefoot standing on mossy forest ground, arms outstretched wide with colorful songbirds — sparrows, robins, doves — perched on his hands and shoulders, a brown rabbit sitting at his feet, golden sunlight streaming through ancient oak trees, green rolling Italian hills in background, soft warm volumetric lighting, glowing gentle halo, rich earthy color palette of browns greens and golds, dynamic joyful pose, high detail, cinematic quality, child-friendly heroic style
+Pixar-style 3D rendered character, St. Francis of Assisi, joyful young man in his early thirties with warm sun-bronzed skin, bright playful brown eyes full of delight, short dark hair, a wide beaming smile, wearing a coarsely-woven rough brown Franciscan habit of undyed wool tied at the waist with a simple knotted white rope cord with three knots representing poverty chastity and obedience, completely barefoot standing on soft mossy forest ground carpeted with clover and wildflowers, both arms outstretched wide in a gesture of total openness and welcome, colorful songbirds — a robin, two doves, a yellow finch, three sparrows — perched on his hands shoulders and the top of his head, a small brown rabbit sitting at his feet looking up at him with calm trust, a white wolf resting peacefully nearby, golden afternoon sunlight streaming through the canopy of ancient gnarled oak trees in shafts of warm amber light, lush green rolling Umbrian hills and Assisi's stone towers visible in the soft background distance, rich earthy color palette of warm browns forest greens golden yellows and sky blues, glowing gentle golden halo, dynamic joyful open pose radiating freedom, Pixar 3D style, child-friendly heroic cinematic quality, high detail
 
 **NEGATIVE:**
 photorealistic, scary, violent, adult content, ugly, deformed, blurry, modern, inappropriate, horror, watermark
 
 ## Character Attributes (Symbols)
-- Brown Franciscan habit — represents his vow of poverty and simplicity, rejecting worldly wealth
-- Birds perched on hands — symbolizes his famous sermon to the birds and his love for all of God's creatures
-- Barefoot stance — sign of humility and his desire to walk humbly on God's earth
+- Rough brown Franciscan habit — his absolute vow of poverty and radical simplicity; he traded silk merchant's robes for the roughest fabric he could find as a sign of freedom
+- Birds perching on his hands — his famous Sermon to the Birds, in which he preached to a flock and they stayed perfectly still listening; his deep belief that every creature praises God
+- Barefoot on the earth — humility, his desire to touch God's creation directly, and his solidarity with the poorest of the poor who had no shoes
 
 ## Historical Quote
 > "Start by doing what's necessary, then what's possible, and suddenly you are doing the impossible."
 
 ## Prayer
-Lord, make me an instrument of Your peace.
-Where there is hatred, let me sow love.
-Through St. Francis, teach us to care for Your creation. Amen.
+Lord, make us instruments of Your peace, as You made Francis.
+Where there is hatred, let us sow love; where darkness, light.
+Through St. Francis, teach us to cherish every creature You have made. Amen.
 
 ## Image Files Needed
 - `portrait.png` — 512×512 (main card)

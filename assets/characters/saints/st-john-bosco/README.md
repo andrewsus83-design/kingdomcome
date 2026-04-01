@@ -3,38 +3,38 @@
 **Feast Day:** January 31
 **Era:** 19th Century (1815–1888)
 **Origin:** Becchi, Piedmont, Italy
-**Patronage:** Young people, apprentices, editors, magicians, schoolchildren
+**Patronage:** Youth, educators, apprentices, editors, magicians, schoolchildren, juvenile delinquents
 **Rarity:** Rare
 
 ## Description
-John Bosco grew up so poor he had to leave home at age 9 to find work, but he never stopped dreaming of helping other poor kids. As a priest in the industrial slums of Turin, he opened schools, workshops, playgrounds, and theaters for street children — turning runaways into craftsmen, scholars, and saints. His Salesian Order now runs thousands of schools worldwide. Don Bosco proves that fun and holiness belong together, and that the best thing you can do for a young person is believe in them.
+John Bosco grew up in crushing poverty in the hills of Piedmont, losing his father when he was just two years old, and had to leave home at age nine to find work as a farmhand just to survive — yet he never stopped dreaming of helping children even poorer and more forgotten than himself. As a young priest in the industrial slums of Turin, he opened his first school in a courtyard, then a church, then a workshop for shoemaking and tailoring, and eventually a whole village of schools, chapels, and theaters for the tens of thousands of street boys flooding into Turin from the countryside. Don Bosco's "Preventive System" of education — based on reason, religion, and loving kindness rather than punishment and fear — is now used in thousands of Salesian schools on every continent. His proof that holiness and fun belong together, that you can win any young person's soul by first winning their heart, makes him the greatest educator-saint in history.
 
 ## Game Stats
 - **Virtue:** Joyfulness
-- **Special Ability:** Oratory Spirit — All games inside The Academy earn +50% FaithCoins for 2 hours. Every game becomes a mini-oratory where fun and faith combine. Cheerful Salesian music plays softly in the background during the effect.
-- **Passive Bonus:** Your character gets one free "retry" on any failed Academy game per day while Don Bosco is your active guardian.
+- **Special Ability:** Don Bosco's Academy — A cheerful burst of bright colors and Salesian energy fills the Academy; for 1 full hour all Academy mini-game scores are doubled, all educational challenge rewards are doubled, and Don Bosco himself appears as an animated character wandering the Academy courtyard giving enthusiastic high-fives to players as they complete activities.
+- **Passive Bonus:** Your character receives one free retry on any failed Academy game per day at no cost while Don Bosco is your active guardian, honoring his belief that second chances are the heart of education.
 - **Unlock Cost:** 800 HolyPoints
 - **Required Monastery Level:** 3
 
 ## OpenArt Prompt
 **POSITIVE:**
-Pixar-style 3D rendered character, St. John Bosco, warm energetic middle-aged priest with laughing dark eyes and a wide generous smile, wearing a black cassock, one hand holding an open book and the other holding a soccer ball, surrounded by three or four small children of different ages laughing and jumping around him, a large fluffy white dog (Grigio) sitting loyally at his feet, bright sunny Turin courtyard with stone arches background, warm golden afternoon light, gentle halo, expression of pure delight and fatherly love, dynamic lively group scene, high detail, cinematic quality, child-friendly heroic style
+Pixar-style 3D rendered character, St. John Bosco (Don Bosco), warm energetic middle-aged Italian priest in his late forties with a broad beaming smile that fills his entire face, laughing dark brown eyes full of genuine delight and fatherly love, short dark hair, wearing a slightly rumpled plain black clerical cassock with a white collar, holding an open illustrated book in one upraised hand and a well-worn soccer ball tucked under his other arm, surrounded by four small children of varied ages — a boy on his left shoulder grinning and pointing, a small girl in a white dress clutching his cassock and looking up, two older boys laughing nearby, one holding up a shoe they are learning to make — a large shaggy white dog (Grigio the mystical guardian wolf-dog) sitting contentedly at his feet looking up with devoted amber eyes, bright sunny Piedmontese stone courtyard background with rounded arches and a simple wooden cross over the chapel doorway, other children playing and chasing each other in the background, warm golden Italian afternoon sunlight, the sound of laughter almost audible, gentle glowing halo over his head, expression of pure irrepressible joy and fierce paternal love, Pixar 3D style, child-friendly heroic cinematic quality, high detail
 
 **NEGATIVE:**
 photorealistic, scary, violent, adult content, ugly, deformed, blurry, modern, inappropriate, horror, watermark
 
 ## Character Attributes (Symbols)
-- Book and ball — his famous motto: reason, religion, and loving kindness; faith and fun are inseparable
-- White dog Grigio — a mysterious white dog appeared repeatedly to protect him from assassins; many believed it was angelic
-- Children surrounding him — his entire life's mission; he called every child he met "my dear son" or "my dear daughter"
+- Open book and soccer ball together — his famous Preventive System in one image: reason, religion, and loving kindness; faith and play are not enemies but partners in forming great human beings
+- White dog Grigio — a large mysterious white dog appeared repeatedly throughout his ministry to protect him from ambushes and assassins in the Turin slums; many believed it was a supernatural guardian sent by God
+- Children of all ages surrounding him — his entire mission, his entire identity; he called every single child he ever met "my dear son" or "my dear daughter" and meant it completely
 
 ## Historical Quote
 > "Run, jump, shout, but do not sin."
 
 ## Prayer
-St. John Bosco, father and teacher of youth,
-Help us find joy in learning and holiness in having fun.
-Protect all children who have no one to love them. Amen.
+St. John Bosco, father and teacher of the young,
+Help us discover that joy and holiness belong together always.
+Protect every child who has no one to believe in them. Amen.
 
 ## Image Files Needed
 - `portrait.png` — 512×512 (main card)
