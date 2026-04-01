@@ -13,16 +13,11 @@ image = (
         "pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime",
         add_python="3.11",
     )
-    .apt_install(
-        "ffmpeg",
-        "pkg-config",
-        "libavcodec-dev",
-        "libavformat-dev",
-        "libavutil-dev",
-        "libavdevice-dev",
-        "libavfilter-dev",
-    )
+    .env({"DEBIAN_FRONTEND": "noninteractive"})
     .run_commands(
+        "apt-get update -y && apt-get install -y --no-install-recommends "
+        "ffmpeg pkg-config libavcodec-dev libavformat-dev libavutil-dev "
+        "libavdevice-dev libavfilter-dev",
         "pip install --upgrade pip",
         "pip install audiocraft",
     )
