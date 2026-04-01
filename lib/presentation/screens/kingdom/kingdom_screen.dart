@@ -11,6 +11,7 @@ import 'package:kingdomcome/core/constants/app_text_styles.dart';
 import 'package:kingdomcome/core/constants/app_spacing.dart';
 import 'package:kingdomcome/data/models/kingdom/building_model.dart';
 import 'package:kingdomcome/data/models/kingdom/building_type.dart';
+import 'package:kingdomcome/data/models/resources/resource_model.dart';
 import 'package:kingdomcome/data/models/saint/saint_model.dart';
 import 'package:kingdomcome/presentation/providers/kingdom_provider.dart';
 import 'package:kingdomcome/presentation/providers/saint_provider.dart';
@@ -117,7 +118,7 @@ class _KingdomScreenState extends ConsumerState<KingdomScreen> {
     );
   }
 
-  int _countResidents(List userSaints) => userSaints.length;
+  int _countResidents(List<dynamic> userSaints) => userSaints.length;
 
   void _showBuildMenu(BuildContext context, int x, int y) {
     showModalBottomSheet<void>(
@@ -842,7 +843,7 @@ class _BlueprintModeOverlay extends StatelessWidget {
 // ── Brick Inventory Bar ───────────────────────────────────────────────────────
 
 class _BrickInventoryBar extends StatelessWidget {
-  final AsyncValue resources;
+  final AsyncValue<ResourceModel> resources;
 
   const _BrickInventoryBar({required this.resources});
 

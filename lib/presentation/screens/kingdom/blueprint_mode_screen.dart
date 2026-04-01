@@ -7,6 +7,7 @@ import 'package:kingdomcome/core/constants/app_colors.dart';
 import 'package:kingdomcome/core/constants/app_text_styles.dart';
 import 'package:kingdomcome/core/constants/app_spacing.dart';
 import 'package:kingdomcome/presentation/providers/kingdom_provider.dart';
+import 'package:kingdomcome/data/models/kingdom/building_model.dart';
 import 'package:kingdomcome/data/models/kingdom/building_type.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -247,7 +248,7 @@ class BlueprintModeScreen extends ConsumerWidget {
 class _BlueprintCard extends ConsumerWidget {
   final _Blueprint blueprint;
   final int kingdomLevel;
-  final List buildings; // List<BuildingModel>
+  final List<BuildingModel> buildings;
   final int animationIndex;
 
   const _BlueprintCard({
@@ -260,17 +261,14 @@ class _BlueprintCard extends ConsumerWidget {
   bool get _meetsLevelRequirement =>
       kingdomLevel >= blueprint.requiredKingdomLevel;
 
-  /// Returns a map of BuildingType → achieved level (0 if not placed).
+  /// Returns a map of BuildingType → highest achieved level (0 if not placed).
   Map<BuildingType, int> _achievedBuildingLevels() {
     final result = <BuildingType, int>{};
     for (final b in buildings) {
-      try {
-        final type = b.type as BuildingType;
-        final level = b.level as int;
-        if (!result.containsKey(type) || result[type]! < level) {
-          result[type] = level;
-        }
-      } catch (_) {}
+      final existing = result[b.type] ?? 0;
+      if (b.level > existing) {
+        result[b.type] = b.level;
+      }
     }
     return result;
   }

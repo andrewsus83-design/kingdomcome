@@ -2,16 +2,21 @@
  * Kingdom Come — AI Gateway Cloudflare Worker
  *
  * Routes AI requests to the appropriate upstream service:
- *   POST /chat               → Magisterium AI (Catholic chat)
- *   POST /generate-image     → Modal.com Flux Schnell (arts & crafts)
- *   POST /generate-character → OpenArt AI (saint/character art)
- *   POST /generate-video     → Runway Gen 4.5 (Bible story videos)
- *   POST /create-avatar-video → HeyGen API (avatar storyteller)
- *   POST /orchestrate        → Claude API (Anthropic, complex workflows)
- *   GET  /wiki/:articleId    → World Anvil API (wiki content)
+ *   POST /chat                        → Magisterium AI (Catholic chat)
+ *   POST /generate-image              → Modal.com Flux Schnell (arts & crafts)
+ *   POST /generate-character          → OpenArt AI (saint/character art)
+ *   POST /generate-video              → Runway Gen 4.5 (Bible story videos)
+ *   POST /create-avatar-video         → HeyGen API (avatar storyteller)
+ *   POST /orchestrate                 → Claude API (Anthropic, complex workflows)
+ *   GET  /wiki/:articleId             → World Anvil API (wiki content)
+ *   POST /music/generate              → Suno AI (custom hymn/music generation)
+ *   POST /music/generate-from-verse   → Suno AI (verse-to-hymn)
+ *   POST /music/feast-day-song        → Suno AI (feast day song)
+ *   GET  /music/kingdom-ambient/:season → Suno AI (liturgical ambient music)
  */
 
 import { filterResponse, validateChatRequest } from "./content-filter";
+import { handleSunoRequest } from "./suno";
 
 // ── Env bindings ─────────────────────────────────────────────────────────────
 
@@ -23,6 +28,7 @@ export interface Env {
   RUNWAY_API_KEY: string;
   HEYGEN_API_KEY: string;
   WORLD_ANVIL_API_KEY: string;
+  SUNO_API_KEY: string;
 }
 
 // ── Rate limiting (in-memory per isolate — coarse guard) ──────────────────────
@@ -153,6 +159,29 @@ export default {
     const wikiMatch = pathname.match(/^\/wiki\/([^/]+)$/);
     if (wikiMatch && request.method === "GET") {
       return handleWiki(wikiMatch[1], env);
+    }
+
+    // ── Suno music routes ─────────────────────────────────────────────────────
+
+    // POST /music/generate
+    if (pathname === "/music/generate" && request.method === "POST") {
+      return handleSunoRequest(request, env);
+    }
+
+    // POST /music/generate-from-verse
+    if (pathname === "/music/generate-from-verse" && request.method === "POST") {
+      return handleSunoRequest(request, env);
+    }
+
+    // POST /music/feast-day-song
+    if (pathname === "/music/feast-day-song" && request.method === "POST") {
+      return handleSunoRequest(request, env);
+    }
+
+    // GET /music/kingdom-ambient/:season
+    const ambientMatch = pathname.match(/^\/music\/kingdom-ambient\/([^/]+)$/);
+    if (ambientMatch && request.method === "GET") {
+      return handleSunoRequest(request, env);
     }
 
     return jsonError("Not found", 404);
