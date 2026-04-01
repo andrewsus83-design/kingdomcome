@@ -22,47 +22,102 @@ abstract final class RouteNames {
 
   // ── Shell / Tab navigation ────────────────────────────────────────────────
 
-  /// Kingdom Map tab (tab 1)
+  /// The Ark tab (tab 0) — Duolingo-style Bible journey
+  static const String ark = '/ark';
+
+  /// The Kingdom tab (tab 1) — hero, center tab
   static const String kingdom = '/kingdom';
 
-  /// Quests tab (tab 2)
+  /// The Academy tab (tab 2) — games, trivia, puzzles
+  static const String academy = '/academy';
+
+  /// The Workshop tab (tab 3) — arts & crafts
+  static const String workshop = '/workshop';
+
+  /// My Soul tab (tab 4) — prayer, grace stats, settings
+  static const String soul = '/soul';
+
+  // ── Legacy tab aliases (kept for backwards compatibility in guards) ────────
+
+  /// @deprecated Use [ark] or [kingdom].
   static const String quests = '/quests';
 
-  /// Prayer tab (tab 3)
+  /// @deprecated Use [soul].
   static const String prayer = '/prayer';
 
-  /// Learn tab (tab 4)
+  /// @deprecated Use [academy] or [workshop].
   static const String learn = '/learn';
 
-  /// Profile tab (tab 5)
+  /// @deprecated Use [soul].
   static const String profile = '/profile';
 
-  // ── Kingdom Map sub-routes ────────────────────────────────────────────────
+  // ── Ark sub-routes ────────────────────────────────────────────────────────
 
+  /// Bible journey node detail (bottom sheet / full screen).
+  static const String arkNodeDetail = '/ark/node/:nodeId';
+
+  /// Story viewer for HeyGen video or Suno audio stories.
+  static const String arkStoryViewer = '/ark/story/:nodeId';
+
+  /// Daily Bread — daily verse experience.
+  static const String dailyBread = '/ark/daily-bread';
+
+  /// Interactive karaoke-style Bible reading.
+  static const String interactiveReading = '/ark/reading/:nodeId';
+
+  // ── Kingdom sub-routes ────────────────────────────────────────────────────
+
+  static const String kingdomBuildMenu = '/kingdom/build';
   static const String buildingDetail = '/kingdom/building/:buildingId';
   static const String buildingUpgrade =
       '/kingdom/building/:buildingId/upgrade';
+  static const String blueprintMode = '/kingdom/blueprints';
+  static const String saintChatKingdom = '/kingdom/saint/:saintId/chat';
+
+  // ── Academy sub-routes ────────────────────────────────────────────────────
+
+  static const String academyTrivia = '/academy/trivia';
+  static const String academyPuzzleRooms = '/academy/puzzles';
+  static const String academyLeaderboard = '/academy/leaderboard';
+  static const String academyGameDetail = '/academy/game/:gameId';
+
+  // ── Workshop sub-routes ───────────────────────────────────────────────────
+
+  static const String workshopScanner = '/workshop/scanner';
+  static const String workshopStainedGlass = '/workshop/stained-glass';
+  static const String workshopManuscript = '/workshop/manuscript';
+  static const String workshopBanner = '/workshop/banner';
+  static const String workshopGallery = '/workshop/gallery';
+  static const String workshopPrintables = '/workshop/printables';
+
+  // ── Soul sub-routes ───────────────────────────────────────────────────────
+
+  static const String prayerChat = '/soul/prayer-chat';
+  static const String graceStats = '/soul/grace-stats';
+  static const String parentGate = '/soul/parent-gate';
+  static const String settings = '/soul/settings';
+  static const String notificationSettings = '/soul/settings/notifications';
+  static const String themeSettings = '/soul/settings/theme';
+  static const String privacySettings = '/soul/settings/privacy';
+  static const String parentDashboard = '/soul/parent-dashboard';
+  static const String parentActivityReport = '/soul/parent-dashboard/report';
+  static const String about = '/soul/about';
+  static const String signOutConfirm = '/soul/sign-out';
+
+  // ── Legacy sub-routes (kept so existing code compiles) ────────────────────
+
   static const String kingdomLeaderboard = '/kingdom/leaderboard';
   static const String kingdomInventory = '/kingdom/inventory';
-
-  // ── Quests sub-routes ─────────────────────────────────────────────────────
-
   static const String questDetail = '/quests/:questId';
   static const String questActive = '/quests/active';
   static const String questComplete = '/quests/:questId/complete';
   static const String questHistory = '/quests/history';
-
-  // ── Prayer sub-routes ─────────────────────────────────────────────────────
-
   static const String prayerDetail = '/prayer/:prayerId';
   static const String rosary = '/prayer/rosary';
   static const String divineOffice = '/prayer/divine-office';
   static const String examen = '/prayer/examen';
   static const String stationsOfCross = '/prayer/stations';
   static const String prayerJournal = '/prayer/journal';
-
-  // ── Learn sub-routes ──────────────────────────────────────────────────────
-
   static const String saintsList = '/learn/saints';
   static const String saintDetail = '/learn/saints/:saintId';
   static const String saintStory = '/learn/saints/:saintId/story';
@@ -71,30 +126,17 @@ abstract final class RouteNames {
   static const String catechismTopic = '/learn/catechism/:topicId';
   static const String bibleExplorer = '/learn/bible';
   static const String bibleBook = '/learn/bible/:bookId';
-  static const String aiChat = '/learn/chat';
+  static const String aiChat = '/soul/prayer-chat';
   static const String liturgicalCalendar = '/learn/calendar';
   static const String worldAnvilWiki = '/learn/wiki';
   static const String worldAnvilArticle = '/learn/wiki/:articleId';
-  static const String craftCanvas = '/learn/craft';
-  static const String craftGallery = '/learn/craft/gallery';
-
-  // ── Profile sub-routes ────────────────────────────────────────────────────
-
-  static const String profileEdit = '/profile/edit';
-  static const String saintPatrons = '/profile/patrons';
-  static const String saintPatronSelect = '/profile/patrons/select';
-  static const String achievements = '/profile/achievements';
-  static const String achievementDetail =
-      '/profile/achievements/:achievementId';
-  static const String settings = '/profile/settings';
-  static const String notificationSettings = '/profile/settings/notifications';
-  static const String themeSettings = '/profile/settings/theme';
-  static const String privacySettings = '/profile/settings/privacy';
-  static const String parentDashboard = '/profile/parent-dashboard';
-  static const String parentActivityReport =
-      '/profile/parent-dashboard/report';
-  static const String about = '/profile/about';
-  static const String signOutConfirm = '/profile/sign-out';
+  static const String craftCanvas = '/workshop/manuscript';
+  static const String craftGallery = '/workshop/gallery';
+  static const String profileEdit = '/soul/profile-edit';
+  static const String saintPatrons = '/soul/patrons';
+  static const String saintPatronSelect = '/soul/patrons/select';
+  static const String achievements = '/soul/achievements';
+  static const String achievementDetail = '/soul/achievements/:achievementId';
 
   // ── Error / misc ──────────────────────────────────────────────────────────
 
@@ -103,52 +145,35 @@ abstract final class RouteNames {
 
   // ── Helper: param extraction ──────────────────────────────────────────────
 
-  /// Returns the full [buildingDetail] path with the [buildingId] filled in.
+  static String arkNodeDetailPath(String nodeId) => '/ark/node/$nodeId';
+  static String arkStoryViewerPath(String nodeId) => '/ark/story/$nodeId';
+  static String interactiveReadingPath(String nodeId) =>
+      '/ark/reading/$nodeId';
+
   static String buildingDetailPath(String buildingId) =>
       '/kingdom/building/$buildingId';
-
-  /// Returns the full [buildingUpgrade] path with the [buildingId] filled in.
   static String buildingUpgradePath(String buildingId) =>
       '/kingdom/building/$buildingId/upgrade';
+  static String saintChatKingdomPath(String saintId) =>
+      '/kingdom/saint/$saintId/chat';
+  static String academyGameDetailPath(String gameId) =>
+      '/academy/game/$gameId';
 
-  /// Returns the full [questDetail] path with the [questId] filled in.
   static String questDetailPath(String questId) => '/quests/$questId';
-
-  /// Returns the full [questComplete] path with the [questId] filled in.
   static String questCompletePath(String questId) =>
       '/quests/$questId/complete';
-
-  /// Returns the full [prayerDetail] path with the [prayerId] filled in.
   static String prayerDetailPath(String prayerId) => '/prayer/$prayerId';
-
-  /// Returns the full [saintDetail] path with the [saintId] filled in.
-  static String saintDetailPath(String saintId) =>
-      '/learn/saints/$saintId';
-
-  /// Returns the full [saintStory] path with the [saintId] filled in.
+  static String saintDetailPath(String saintId) => '/learn/saints/$saintId';
   static String saintStoryPath(String saintId) =>
       '/learn/saints/$saintId/story';
-
-  /// Returns the full [saintArt] path with the [saintId] filled in.
-  static String saintArtPath(String saintId) =>
-      '/learn/saints/$saintId/art';
-
-  /// Returns the full [catechismTopic] path with the [topicId] filled in.
+  static String saintArtPath(String saintId) => '/learn/saints/$saintId/art';
   static String catechismTopicPath(String topicId) =>
       '/learn/catechism/$topicId';
-
-  /// Returns the full [bibleBook] path with the [bookId] filled in.
   static String bibleBookPath(String bookId) => '/learn/bible/$bookId';
-
-  /// Returns the full [worldAnvilArticle] path with the [articleId] filled in.
   static String worldAnvilArticlePath(String articleId) =>
       '/learn/wiki/$articleId';
-
-  /// Returns the full [achievementDetail] path with the [achievementId] filled.
   static String achievementDetailPath(String achievementId) =>
-      '/profile/achievements/$achievementId';
-
-  /// Returns the full [parentalConsentVerify] path with [token] filled in.
+      '/soul/achievements/$achievementId';
   static String parentalConsentVerifyPath(String token) =>
       '/parental-consent/verify/$token';
 }
