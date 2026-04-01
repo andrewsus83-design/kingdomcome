@@ -1,30 +1,31 @@
 # JUDITH
 **Testament:** Old Testament
-**Book(s):** Judith (Deuterocanonical)
-**Era:** Post-Exilic Period (approximately 5th–4th century BC)
-**Role:** Heroine — Brave Widow Who Saved Her People
+**Book(s):** Judith 1–16 (Deuterocanonical)
+**Era:** Post-Exilic Period (~second century BC)
+**Role:** Heroic Widow — Deliverer of Bethulia
 **Rarity:** Epic
 
 ## Description
-Judith was a beautiful and devout Jewish widow who showed incredible bravery when the powerful Assyrian general Holofernes besieged her city of Bethulia. Trusting completely in God's help, she went alone into the enemy camp, and through divine providence delivered her people from destruction and sent the entire enemy army fleeing. Judith is celebrated in the Church as a heroic figure of faith, courage, and trust in God's power working through the humble.
+Judith was a beautiful, devout, and extraordinarily brave Jewish widow living in the besieged city of Bethulia — her city was on the verge of surrendering to the massive Assyrian army of General Holofernes, and her people were starving and losing hope. Rather than wait for defeat, Judith put on her finest clothes, prayed with all her heart for God's help, and walked alone into the enemy camp armed with nothing but courage, wisdom, and absolute trust in God. Through God's miraculous providence she delivered her city and her people from total destruction, and the entire Assyrian army fled in panic — not because of superior weapons or armies, but because God works through the humble, the faithful, and the seemingly weak. The Church has long celebrated Judith as a type of Mary, crushing evil through her faith, and her story reminds us that with God on our side, no enemy is too great.
 
 ## Game Stats
-- **Virtue:** Bravery
-- **Special Ability:** Bethulia's Deliverer — Instantly defeats the most powerful enemy unit on the field and causes enemy morale to collapse, routing all weaker enemies
-- **Unlock Cost:** 3500 HolyPoints
+- **Virtue:** Courageous Faith in Action
+- **Special Ability:** Bethulia's Deliverer — Judith raises her sword to heaven in a triumphant victory salute and calls on God's name aloud; the most powerful enemy unit on the field is instantly and completely defeated, and all remaining enemy units suffer a catastrophic -60% morale collapse, routing the weakest enemies immediately and leaving the rest vulnerable for 15 seconds.
+- **Passive Bonus:** Widow's Devotion — Judith's daily prayer life inspires the entire kingdom; all allied units regenerate health 20% faster, and the kingdom's prayer building generates HolyPoints at double rate while Judith is present, reflecting her extraordinary life of fasting, prayer, and trust in God.
+- **Unlock Cost:** 1200 HolyPoints
 - **Required Building:** Cathedral Level 3
 
 ## OpenArt Prompt
 **POSITIVE:**
-Semi-cartoon Pixar-style 3D rendered character illustration, Catholic mobile game hero card, Judith the brave widow of Bethulia. Strikingly beautiful and dignified Jewish woman with warm olive skin, dark hair pulled back under an elegant widow's veil of deep burgundy, strong determined eyes radiating holy courage and complete trust in God. Wearing widow's garments transformed for her mission — a dignified robe of deep teal and gold over which she wears a warrior's sash, sandaled feet. She holds a gleaming bronze sword in one raised hand in a triumphant gesture of deliverance — depicted in a tasteful, stylized heroic manner appropriate for children (no gore, purely symbolic victory pose, sword raised upward in triumph toward heaven). In her other hand a small oil lamp that glows with golden divine light. A decorative bag at her side. The scene is bathed in golden divine light symbolizing God's protective presence. Background: the walls of Bethulia behind her, her people visible celebrating safely behind the gates, enemy tents in retreat on the distant plain. Subtle golden halo glow around her head. Warm rich biblical color palette, clean cel-shaded digital art, mobile game hero card illustration, sacred art aesthetic, age-appropriate 8-18.
+Semi-cartoon Pixar-style 3D rendered character illustration, Catholic mobile game hero card, Judith the heroic widow and deliverer of Bethulia. Strikingly beautiful and deeply dignified Jewish woman with warm olive skin, dark hair pinned elegantly with golden pins beneath an embroidered widow's veil of deep burgundy-red, and strong determined eyes radiating absolute holy courage and complete unshakeable trust in God — not fear, not hesitation, only faith. She wears a dignified robe of deep teal with gold embroidered borders and a warrior's crimson sash across her chest, simple sandaled feet. She stands in a triumphant pose with one arm raised holding a gleaming bronze sword pointed upward toward heaven — depicted in a heroic, tasteful, child-appropriate manner (sword raised in victory toward God, purely symbolic, no graphic content). In her other hand a small oil lamp glows with warm golden divine light, symbolizing God's presence guiding her steps in the darkness. A decorative embroidered bag hangs at her side. Golden divine light bathes her entire figure from above, symbolizing God's protective and empowering presence throughout her mission. Background: the fortified walls of Bethulia behind her with her people celebrating safely within the gates, enemy campfires visible retreating in disorder on the distant plain. A warm golden halo radiates around her head. Deep teal, burgundy, gold, and warm lamplight color palette, clean cel-shaded digital art, mobile game hero card illustration, sacred art aesthetic, age-appropriate 8–18.
 
 **NEGATIVE:**
-photorealistic, scary, dark, violent, adult content, ugly, deformed, blurry, modern clothing, inappropriate, horror, watermark, gore, graphic violence, severed head shown realistically
+photorealistic, scary, dark, violent, adult content, ugly, deformed, blurry, modern clothing, inappropriate, horror, watermark, gore, graphic violence
 
 ## Character Attributes (Symbols to include in art)
-- Bronze sword raised in triumphant victory gesture (pointing upward to God)
-- Oil lamp glowing with divine light
-- Walls of Bethulia with celebrating townspeople behind her
+- Bronze sword raised triumphantly upward toward heaven — symbol of her God-empowered victory and the reminder that all glory belongs to God, not to her own strength (Judith 13:18)
+- Golden oil lamp — symbol of God's guiding light through her most dangerous mission and her life of prayer and devotion
+- Walls of Bethulia with celebrating townspeople — symbol of the city and the people she saved through courageous faith when all hope seemed lost
 
 ## Image Files Needed
 Place these files in this folder:
