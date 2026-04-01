@@ -4,15 +4,14 @@ compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-MAGISTERIUM_API_KEY = ""
-ANTHROPIC_API_KEY = ""
-MODAL_API_KEY = ""
 MODAL_FLUX_URL = "https://andrewsus83-design--kingdom-come-flux-fluxmodel-generate.modal.run"
 MODAL_VIDEO_URL = "https://andrewsus83-design--kingdom-come-video-stitch.modal.run"
-RUNWAY_API_KEY = ""
-HEYGEN_API_KEY = ""
-WORLD_ANVIL_API_KEY = ""
 R2_ASSETS_BASE_URL = "https://assets.kingdomcomeapp.com"
+
+# NOTE: All API keys (MAGISTERIUM_API_KEY, ANTHROPIC_API_KEY, MODAL_API_KEY,
+# RUNWAY_API_KEY, HEYGEN_API_KEY, WORLD_ANVIL_API_KEY) are set as encrypted
+# Cloudflare secrets via: wrangler secret put <KEY_NAME>
+# NEVER put secret values in [vars] — they will override wrangler secrets on deploy.
 
 [[r2_buckets]]
 binding = "ASSETS_BUCKET"
