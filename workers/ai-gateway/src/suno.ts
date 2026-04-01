@@ -1,49 +1,17 @@
 /**
- * Kingdom Come — Suno AI Music Generation Module
+ * Kingdom Come — Audio Module (ElevenLabs TTS + MusicGen via Modal.com)
  *
  * Endpoints handled:
- *   POST /music/generate               → generate a Catholic song
- *   POST /music/generate-from-verse    → generate hymn from Bible verse
- *   POST /music/feast-day-song         → generate song for a saint's feast day
- *   GET  /music/kingdom-ambient/:season → get/generate ambient music for liturgical season
+ *   POST /audio/narrate-verse    → ElevenLabs TTS for a Bible verse
+ *   POST /audio/narrate-story    → ElevenLabs TTS for Bible story panel text
+ *   POST /audio/saint-voice      → Saint narrator voice via ElevenLabs
+ *   POST /music/ambient          → Ambient music via MusicGen on Modal.com
+ *   POST /music/victory-jingle   → Short victory music via MusicGen on Modal.com
  */
 
-export interface SunoEnv {
-  SUNO_API_KEY: string;
-}
-
-// ── Suno API types ────────────────────────────────────────────────────────────
-
-interface SunoGenerateRequest {
-  prompt: string;
-  style?: string;
-  title?: string;
-  instrumental?: boolean;
-  make_instrumental?: boolean;
-  tags?: string;
-  wait_audio?: boolean;
-}
-
-interface SunoClip {
-  id: string;
-  audio_url: string;
-  video_url?: string;
-  title: string;
-  metadata?: {
-    duration?: number;
-    tags?: string;
-  };
-  duration?: number;
-  status: string;
-}
-
-interface SunoGenerateResponse {
-  clips?: SunoClip[];
-  id?: string;
-  audio_url?: string;
-  video_url?: string;
-  title?: string;
-  duration?: number;
+export interface AudioEnv {
+  ELEVENLABS_API_KEY: string;
+  MODAL_API_KEY: string;
 }
 
 // ── CORS / response helpers ───────────────────────────────────────────────────
@@ -68,102 +36,139 @@ function jsonError(message: string, status = 400): Response {
   });
 }
 
-// ── Suno API wrapper ──────────────────────────────────────────────────────────
+// ── ElevenLabs constants ──────────────────────────────────────────────────────
 
-const SUNO_BASE = "https://api.suno.ai";
+const ELEVENLABS_BASE = "https://api.elevenlabs.io";
 
-async function generateSunoMusic(
-  payload: SunoGenerateRequest,
+// Saint → ElevenLabs voice ID map
+// Each saint has a voice that matches their character.
+const SAINT_VOICE_IDS: Record<string, string> = {
+  "St. Francis":        "21m00Tcm4TlvDq8ikWAM", // warm, gentle
+  "St. Joan of Arc":    "AZnzlk1XvdvUeBnXmlld", // strong, confident
+  "St. Therese":        "EXAVITQu4vr4xnSDxMaL", // soft, young
+  "St. Thomas Aquinas": "ErXwobaYiN019PkySvjV", // scholarly, calm
+  "St. Dominic":        "VR6AewLTigWG4xSOukaG", // preacher, resonant
+};
+
+const DEFAULT_VOICE_ID = "pNInz6obpgDQGcFmaJgB"; // neutral, clear
+
+function resolveVoiceId(saintName?: string): string {
+  if (!saintName) return DEFAULT_VOICE_ID;
+  return SAINT_VOICE_IDS[saintName] ?? DEFAULT_VOICE_ID;
+}
+
+// ── ElevenLabs TTS wrapper ────────────────────────────────────────────────────
+
+interface ElevenLabsTtsResult {
+  audioUrl: string;
+  durationSeconds: number;
+}
+
+async function callElevenLabsTts(
+  text: string,
+  voiceId: string,
   apiKey: string
-): Promise<{ audio_url: string; video_url: string; title: string; duration: number }> {
-  const response = await fetch(`${SUNO_BASE}/v2/generate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      ...payload,
-      wait_audio: true, // wait for generation to complete
-    }),
-  });
+): Promise<ElevenLabsTtsResult> {
+  const response = await fetch(
+    `${ELEVENLABS_BASE}/v1/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_turbo_v2",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.0,
+          use_speaker_boost: true,
+        },
+      }),
+    }
+  );
 
   if (!response.ok) {
     const err = await response.text();
-    throw new Error(`Suno API error ${response.status}: ${err}`);
+    throw new Error(`ElevenLabs API error ${response.status}: ${err}`);
   }
 
-  const data = (await response.json()) as SunoGenerateResponse;
+  // ElevenLabs returns raw audio bytes; we convert to a data URI so the
+  // Flutter client can play it directly without a separate storage step.
+  const audioBuffer = await response.arrayBuffer();
+  const base64 = btoa(
+    String.fromCharCode(...new Uint8Array(audioBuffer))
+  );
+  const audioUrl = `data:audio/mpeg;base64,${base64}`;
 
-  // Suno returns an array of clips; use the first one
-  const clip = data.clips?.[0];
-  if (!clip) {
-    throw new Error("Suno returned no clips.");
-  }
+  // Estimate duration: ~150 words/min, average 5 chars/word
+  const wordCount = text.trim().split(/\s+/).length;
+  const durationSeconds = Math.ceil((wordCount / 150) * 60);
 
-  return {
-    audio_url: clip.audio_url,
-    video_url: clip.video_url ?? "",
-    title: clip.title,
-    duration: clip.duration ?? clip.metadata?.duration ?? 0,
-  };
+  return { audioUrl, durationSeconds };
 }
 
-// ── Ambient music cache (in-memory per isolate) ───────────────────────────────
+// ── MusicGen (Modal.com) wrapper ──────────────────────────────────────────────
 
-const ambientCache = new Map<string, { result: unknown; cachedAt: number }>();
-const AMBIENT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+interface MusicGenResult {
+  audioUrl: string;
+  durationSeconds: number;
+  prompt: string;
+}
 
-// ── Style presets ─────────────────────────────────────────────────────────────
+async function callMusicGen(
+  prompt: string,
+  durationSeconds: number,
+  apiKey: string
+): Promise<MusicGenResult> {
+  const response = await fetch(
+    "https://modal-labs--kingdom-come-musicgen.modal.run/generate",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        prompt,
+        duration: durationSeconds,
+        model: "facebook/musicgen-medium",
+        top_k: 250,
+        top_p: 0.0,
+        temperature: 1.0,
+        cfg_coef: 3.0,
+      }),
+    }
+  );
 
-const LITURGICAL_SEASON_PROMPTS: Record<string, { prompt: string; style: string; tags: string }> = {
-  advent: {
-    prompt:
-      "Peaceful Advent hymn, waiting in joyful hope, purple and gold, O Come O Come Emmanuel mood, " +
-      "contemplative, ancient Catholic chant blended with gentle orchestral",
-    style: "gregorian chant orchestral blend",
-    tags: "advent, Catholic, hymn, contemplative, orchestral",
-  },
-  christmas: {
-    prompt:
-      "Joyful Christmas hymn celebrating the birth of Jesus, choir of angels, warm and celebratory, " +
-      "traditional Catholic Christmas carol energy, bells and strings",
-    style: "traditional christmas choir orchestral",
-    tags: "christmas, Catholic, carol, joyful, choir",
-  },
-  ordinary: {
-    prompt:
-      "Peaceful Catholic background music for ordinary time, green fields and daily faith, " +
-      "gentle contemplative melody, piano and strings, uplifting without being dramatic",
-    style: "contemporary Catholic ambient",
-    tags: "ordinary time, Catholic, ambient, peaceful, piano",
-  },
-  lent: {
-    prompt:
-      "Solemn Lenten meditation, desert journey with Christ, sacrifice and hope, Miserere tone, " +
-      "minor key, sparse instrumentation, profound and reflective",
-    style: "gregorian chant solemn meditation",
-    tags: "lent, Catholic, solemn, meditation, penitential",
-  },
-  easter: {
-    prompt:
-      "Triumphant Easter Alleluia, Christ is risen, joyful and victorious, full choir and orchestra, " +
-      "golden light breaking through darkness, exultant praise",
-    style: "triumphant choral orchestral",
-    tags: "easter, Catholic, alleluia, triumphant, resurrection",
-  },
-  pentecost: {
-    prompt:
-      "Fiery Pentecost celebration, Holy Spirit descends, red and gold, Wind and flame, " +
-      "vibrant and Spirit-filled, contemporary Catholic worship energy",
-    style: "contemporary Catholic worship",
-    tags: "pentecost, Catholic, Holy Spirit, vibrant, praise",
-  },
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`MusicGen Modal error ${response.status}: ${err}`);
+  }
+
+  const data = (await response.json()) as { audio_url?: string; url?: string };
+  const audioUrl = data.audio_url ?? data.url ?? "";
+  if (!audioUrl) throw new Error("MusicGen returned no audio URL.");
+
+  return { audioUrl, durationSeconds, prompt };
+}
+
+// ── Liturgical season prompt map ──────────────────────────────────────────────
+
+const SEASON_PROMPTS: Record<string, string> = {
+  advent:    "Gregorian chant advent liturgical Catholic peaceful ambient, contemplative waiting, O Come O Come Emmanuel",
+  christmas: "Gregorian chant christmas liturgical Catholic joyful ambient, bells and strings, Gloria in Excelsis Deo",
+  ordinary:  "Gregorian chant ordinary time liturgical Catholic peaceful ambient, gentle contemplative melody, daily faith",
+  lent:      "Gregorian chant lent liturgical Catholic solemn ambient, Miserere, desert journey, penitential reflection",
+  easter:    "Gregorian chant easter liturgical Catholic triumphant ambient, Alleluia, resurrection joy, full and bright",
+  pentecost: "Gregorian chant pentecost liturgical Catholic vibrant ambient, Holy Spirit, wind and fire, Spirit-filled praise",
 };
 
 // ── Route handlers ────────────────────────────────────────────────────────────
 
-async function handleGenerate(request: Request, env: SunoEnv): Promise<Response> {
+async function handleNarrateVerse(request: Request, env: AudioEnv): Promise<Response> {
   let body: Record<string, unknown>;
   try {
     body = (await request.json()) as Record<string, unknown>;
@@ -171,86 +176,55 @@ async function handleGenerate(request: Request, env: SunoEnv): Promise<Response>
     return jsonError("Invalid JSON body.");
   }
 
-  const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
-  const style = typeof body.style === "string" ? body.style : "contemporary Catholic";
-  const title = typeof body.title === "string" ? body.title : "Catholic Hymn";
-  const instrumental = typeof body.instrumental === "boolean" ? body.instrumental : false;
-
-  if (!prompt) return jsonError("Field 'prompt' is required.");
-
-  // Enrich prompt with Catholic context
-  const enrichedPrompt =
-    `Catholic sacred music for youth ages 8-18. ${prompt}. ` +
-    `Appropriate for church and faith formation. No secular or inappropriate themes.`;
-
-  try {
-    const result = await generateSunoMusic(
-      {
-        prompt: enrichedPrompt,
-        style,
-        title: `Kingdom Come — ${title}`,
-        instrumental,
-        tags: "Catholic, sacred, faith, youth",
-      },
-      env.SUNO_API_KEY
-    );
-    return jsonOk(result);
-  } catch (err) {
-    console.error("Suno /music/generate error:", err);
-    return jsonError("Music generation service temporarily unavailable.", 502);
-  }
-}
-
-async function handleGenerateFromVerse(request: Request, env: SunoEnv): Promise<Response> {
-  let body: Record<string, unknown>;
-  try {
-    body = (await request.json()) as Record<string, unknown>;
-  } catch {
-    return jsonError("Invalid JSON body.");
-  }
-
-  const verseText = typeof body.verseText === "string" ? body.verseText.trim() : "";
+  const text = typeof body.text === "string" ? body.text.trim() : "";
   const verseRef = typeof body.verseRef === "string" ? body.verseRef.trim() : "";
-  const style = typeof body.style === "string" ? body.style : "hymn";
+  const voiceId =
+    typeof body.voiceId === "string"
+      ? body.voiceId.trim()
+      : typeof body.saintNarratorId === "string"
+      ? resolveVoiceId(body.saintNarratorId as string)
+      : DEFAULT_VOICE_ID;
 
-  if (!verseText) return jsonError("Field 'verseText' is required.");
+  if (!text) return jsonError("Field 'text' is required.");
   if (!verseRef) return jsonError("Field 'verseRef' is required.");
 
-  const validStyles = ["gregorian", "hymn", "contemporary", "kids"];
-  if (!validStyles.includes(style)) {
-    return jsonError(`Field 'style' must be one of: ${validStyles.join(", ")}.`);
-  }
-
-  const styleDescriptions: Record<string, string> = {
-    gregorian: "Gregorian chant, ancient Catholic plainchant, monastery choir, sacred and meditative",
-    hymn: "Traditional Catholic hymn, four-part harmony, organ, reverent and uplifting",
-    contemporary: "Contemporary Catholic worship, guitar and piano, modern praise, youth-friendly",
-    kids: "Fun Catholic kids song, simple melody, joyful and bouncy, easy to sing along",
-  };
-
-  const prompt =
-    `A ${styleDescriptions[style]} setting of this Bible verse: "${verseText}" (${verseRef}). ` +
-    `The lyrics should closely follow the verse text. Sacred, Catholic, faith-filled.`;
+  // Wrap in a clean reading style preamble
+  const narrationText = `${verseRef}. ${text}`;
 
   try {
-    const result = await generateSunoMusic(
-      {
-        prompt,
-        style: styleDescriptions[style],
-        title: `${verseRef} — Sacred Hymn`,
-        instrumental: false,
-        tags: `Catholic, scripture, hymn, ${style}, ${verseRef}`,
-      },
-      env.SUNO_API_KEY
-    );
-    return jsonOk({ ...result, verseRef, verseText });
+    const result = await callElevenLabsTts(narrationText, voiceId, env.ELEVENLABS_API_KEY);
+    return jsonOk({ ...result, verseRef });
   } catch (err) {
-    console.error("Suno /music/generate-from-verse error:", err);
-    return jsonError("Hymn generation service temporarily unavailable.", 502);
+    console.error("ElevenLabs /audio/narrate-verse error:", err);
+    return jsonError("Voice narration service temporarily unavailable.", 502);
   }
 }
 
-async function handleFeastDaySong(request: Request, env: SunoEnv): Promise<Response> {
+async function handleNarrateStory(request: Request, env: AudioEnv): Promise<Response> {
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return jsonError("Invalid JSON body.");
+  }
+
+  const text = typeof body.text === "string" ? body.text.trim() : "";
+  const saintNarratorId = typeof body.saintNarratorId === "string" ? body.saintNarratorId.trim() : "";
+
+  if (!text) return jsonError("Field 'text' is required.");
+
+  const voiceId = resolveVoiceId(saintNarratorId || undefined);
+
+  try {
+    const result = await callElevenLabsTts(text, voiceId, env.ELEVENLABS_API_KEY);
+    return jsonOk({ ...result, saintNarratorId: saintNarratorId || null });
+  } catch (err) {
+    console.error("ElevenLabs /audio/narrate-story error:", err);
+    return jsonError("Story narration service temporarily unavailable.", 502);
+  }
+}
+
+async function handleSaintVoice(request: Request, env: AudioEnv): Promise<Response> {
   let body: Record<string, unknown>;
   try {
     body = (await request.json()) as Record<string, unknown>;
@@ -259,121 +233,102 @@ async function handleFeastDaySong(request: Request, env: SunoEnv): Promise<Respo
   }
 
   const saintName = typeof body.saintName === "string" ? body.saintName.trim() : "";
-  const patronage = typeof body.patronage === "string" ? body.patronage.trim() : "";
-  const era = typeof body.era === "string" ? body.era.trim() : "unknown era";
+  const text = typeof body.text === "string" ? body.text.trim() : "";
 
   if (!saintName) return jsonError("Field 'saintName' is required.");
+  if (!text) return jsonError("Field 'text' is required.");
 
-  const patronageText = patronage ? `, patron of ${patronage}` : "";
-
-  const prompt =
-    `A joyful Catholic feast day song celebrating ${saintName}${patronageText}, who lived in the ${era}. ` +
-    `The song praises their holy life, virtues, and intercession. Uplifting, traditional Catholic hymn style, ` +
-    `suitable for children and youth. Include references to their specific patronage and life story.`;
+  const voiceId = resolveVoiceId(saintName);
 
   try {
-    const result = await generateSunoMusic(
-      {
-        prompt,
-        style: "traditional Catholic feast day hymn",
-        title: `Feast of ${saintName}`,
-        instrumental: false,
-        tags: `Catholic, saint, feast day, ${saintName}, hymn`,
-      },
-      env.SUNO_API_KEY
-    );
-    return jsonOk({ ...result, saintName, patronage, era });
+    const result = await callElevenLabsTts(text, voiceId, env.ELEVENLABS_API_KEY);
+    return jsonOk({ ...result, saintName, voiceId });
   } catch (err) {
-    console.error("Suno /music/feast-day-song error:", err);
-    return jsonError("Feast day song generation temporarily unavailable.", 502);
+    console.error("ElevenLabs /audio/saint-voice error:", err);
+    return jsonError("Saint voice narration temporarily unavailable.", 502);
   }
 }
 
-async function handleKingdomAmbient(season: string, env: SunoEnv): Promise<Response> {
-  const validSeasons = ["advent", "christmas", "ordinary", "lent", "easter", "pentecost"];
-  if (!validSeasons.includes(season)) {
-    return jsonError(`Season must be one of: ${validSeasons.join(", ")}.`);
+async function handleAmbientMusic(request: Request, env: AudioEnv): Promise<Response> {
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return jsonError("Invalid JSON body.");
   }
 
-  // Check in-memory cache
-  const cached = ambientCache.get(season);
-  if (cached && Date.now() - cached.cachedAt < AMBIENT_CACHE_TTL_MS) {
-    return jsonOk({ ...cached.result, cached: true });
+  const season = typeof body.season === "string" ? body.season.trim().toLowerCase() : "";
+  const duration = typeof body.duration === "number" ? Math.min(body.duration, 300) : 60;
+
+  const validSeasons = Object.keys(SEASON_PROMPTS);
+  if (!season || !validSeasons.includes(season)) {
+    return jsonError(`Field 'season' must be one of: ${validSeasons.join(", ")}.`);
   }
 
-  const preset = LITURGICAL_SEASON_PROMPTS[season];
+  const prompt = SEASON_PROMPTS[season];
 
   try {
-    const result = await generateSunoMusic(
-      {
-        prompt: preset.prompt,
-        style: preset.style,
-        title: `Kingdom Come — ${season.charAt(0).toUpperCase() + season.slice(1)} Ambient`,
-        instrumental: true, // ambient music is instrumental
-        tags: preset.tags,
-      },
-      env.SUNO_API_KEY
-    );
-
-    const response = { ...result, season };
-    ambientCache.set(season, { result: response, cachedAt: Date.now() });
-    return jsonOk(response);
+    const result = await callMusicGen(prompt, duration, env.MODAL_API_KEY);
+    return jsonOk({ ...result, season });
   } catch (err) {
-    console.error(`Suno /music/kingdom-ambient/${season} error:`, err);
+    console.error("MusicGen /music/ambient error:", err);
     return jsonError("Ambient music generation temporarily unavailable.", 502);
+  }
+}
+
+async function handleVictoryJingle(request: Request, env: AudioEnv): Promise<Response> {
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return jsonError("Invalid JSON body.");
+  }
+
+  const questCategory = typeof body.questCategory === "string" ? body.questCategory.trim() : "";
+  if (!questCategory) return jsonError("Field 'questCategory' is required.");
+
+  const prompt =
+    `Short triumphant Catholic victory jingle for completing a ${questCategory} quest, ` +
+    `sacred orchestral fanfare, 5 seconds, celebratory and uplifting, Gregorian chant influence`;
+
+  try {
+    const result = await callMusicGen(prompt, 5, env.MODAL_API_KEY);
+    return jsonOk({ ...result, questCategory });
+  } catch (err) {
+    console.error("MusicGen /music/victory-jingle error:", err);
+    return jsonError("Victory jingle generation temporarily unavailable.", 502);
   }
 }
 
 // ── Main exported handler ─────────────────────────────────────────────────────
 
-export async function handleSunoRequest(request: Request, env: SunoEnv): Promise<Response> {
-  const url = new URL(request.url);
+export async function handleAudioRequest(request: Request, env: AudioEnv): Promise<Response> {
   const { pathname, method } = request;
 
-  // POST /music/generate
-  if (pathname === "/music/generate" && method === "POST") {
-    return handleGenerate(request, env);
+  // POST /audio/narrate-verse
+  if (pathname === "/audio/narrate-verse" && method === "POST") {
+    return handleNarrateVerse(request, env);
   }
 
-  // POST /music/generate-from-verse
-  if (pathname === "/music/generate-from-verse" && method === "POST") {
-    return handleGenerateFromVerse(request, env);
+  // POST /audio/narrate-story
+  if (pathname === "/audio/narrate-story" && method === "POST") {
+    return handleNarrateStory(request, env);
   }
 
-  // POST /music/feast-day-song
-  if (pathname === "/music/feast-day-song" && method === "POST") {
-    return handleFeastDaySong(request, env);
+  // POST /audio/saint-voice
+  if (pathname === "/audio/saint-voice" && method === "POST") {
+    return handleSaintVoice(request, env);
   }
 
-  // GET /music/kingdom-ambient/:season
-  const ambientMatch = pathname.match(/^\/music\/kingdom-ambient\/([^/]+)$/);
-  if (ambientMatch && method === "GET") {
-    return handleKingdomAmbient(ambientMatch[1], env);
+  // POST /music/ambient
+  if (pathname === "/music/ambient" && method === "POST") {
+    return handleAmbientMusic(request, env);
   }
 
-  // POST /music/quest-victory/:category (bonus endpoint)
-  const questMatch = pathname.match(/^\/music\/quest-victory\/([^/]+)$/);
-  if (questMatch && method === "POST") {
-    const category = questMatch[1];
-    const prompt =
-      `Short triumphant Catholic victory jingle for completing a ${category} quest in a Catholic game for children. ` +
-      `5-10 seconds, celebratory, sacred, uplifting.`;
-    try {
-      const result = await generateSunoMusic(
-        {
-          prompt,
-          style: "short victory jingle, sacred, orchestral",
-          title: `Victory — ${category}`,
-          instrumental: true,
-          tags: `Catholic, victory, jingle, ${category}`,
-        },
-        env.SUNO_API_KEY
-      );
-      return jsonOk({ ...result, questCategory: category });
-    } catch {
-      return jsonError("Victory jingle generation temporarily unavailable.", 502);
-    }
+  // POST /music/victory-jingle
+  if (pathname === "/music/victory-jingle" && method === "POST") {
+    return handleVictoryJingle(request, env);
   }
 
-  return jsonError("Suno: route not found.", 404);
+  return jsonError("Audio: route not found.", 404);
 }

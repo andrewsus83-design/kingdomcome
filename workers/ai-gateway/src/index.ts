@@ -155,6 +155,11 @@ export default {
       return handleOrchestrate(request, env, ageGroup);
     }
 
+    // POST /analyze-artwork → Claude Vision API (Masterpiece Scanner)
+    if (pathname === "/analyze-artwork" && request.method === "POST") {
+      return handleAnalyzeArtwork(request, env, userId);
+    }
+
     // GET /wiki/:articleId
     const wikiMatch = pathname.match(/^\/wiki\/([^/]+)$/);
     if (wikiMatch && request.method === "GET") {
