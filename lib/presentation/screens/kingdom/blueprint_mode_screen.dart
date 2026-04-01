@@ -230,7 +230,7 @@ class BlueprintModeScreen extends ConsumerWidget {
                 return _BlueprintCard(
                   blueprint: bp,
                   kingdomLevel: kingdomLevel,
-                  kingdomBuildings:
+                  buildings:
                       kingdomAsync.valueOrNull?.buildings ?? [],
                   animationIndex: i,
                 ).animate(delay: Duration(milliseconds: i * 100)).fadeIn().slideY(begin: 0.1);

@@ -271,7 +271,7 @@ class PowerUpComponent extends PositionComponent with HasGameRef<RosaryRunnerGam
 
 // ── Main Flame game ───────────────────────────────────────────────────────────
 
-class RosaryRunnerGame extends FlameGame with TapCallbacks, HorizontalDragCallbacks {
+class RosaryRunnerGame extends FlameGame with TapCallbacks, DragCallbacks {
   RosaryRunnerGame({
     required this.onGameOver,
     required this.onRosaryComplete,
@@ -463,7 +463,7 @@ class RosaryRunnerGame extends FlameGame with TapCallbacks, HorizontalDragCallba
   }
 
   @override
-  void onHorizontalDragStart(HorizontalDragStartEvent event) {}
+  void onDragStart(DragStartEvent event) {}
 
   @override
   void render(Canvas canvas) {
@@ -504,7 +504,7 @@ class RosaryRunnerGame extends FlameGame with TapCallbacks, HorizontalDragCallba
     // Bead progress
     final decades = _beadsCollected ~/ 10;
     final beadsInDecade = _beadsCollected % 10;
-    drawText('📿 Decade $_decades/5', 12, 10, color: const Color(0xFF9B59B6));
+    drawText('📿 Decade $decades/5', 12, 10, color: const Color(0xFF9B59B6));
     drawText('Beads: $beadsInDecade/10', 12, 30, color: Colors.white70);
 
     // Speed

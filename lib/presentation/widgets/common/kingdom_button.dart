@@ -223,8 +223,8 @@ class _SecondaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: AppSpacing.borderRadiusMd,
         ),
-        minimumSize: widget.minWidth != null
-            ? Size(widget.minWidth!, 52)
+        minimumSize: minWidth != null
+            ? Size(minWidth!, 52)
             : const Size(double.infinity, 52),
       ),
       child: isLoading
