@@ -6,7 +6,7 @@ abstract final class SupabaseConstants {
   // ── Tables ────────────────────────────────────────────────────────────────
 
   /// Player profile table — one row per auth user.
-  static const String tableProfiles = 'profiles';
+  static const String tableProfiles = 'user_profiles';
 
   /// Player resources (holy points, faith coins, grace, blessings).
   static const String tableResources = 'player_resources';
@@ -15,19 +15,19 @@ abstract final class SupabaseConstants {
   static const String tableProgress = 'player_progress';
 
   /// Kingdom buildings per player.
-  static const String tableBuildings = 'kingdom_buildings';
+  static const String tableBuildings = 'buildings';
 
   /// Quests master list (seeded by admin).
   static const String tableQuests = 'quests';
 
   /// Player quest progress — junction table.
-  static const String tablePlayerQuests = 'player_quests';
+  static const String tablePlayerQuests = 'quest_completions';
 
   /// Saints reference data (seeded).
   static const String tableSaints = 'saints';
 
   /// Player-saint patron relationships.
-  static const String tablePatronSaints = 'player_patron_saints';
+  static const String tablePatronSaints = 'user_saints';
 
   /// Patron saint ability slots per player.
   static const String tableSaintAbilities = 'saint_abilities';

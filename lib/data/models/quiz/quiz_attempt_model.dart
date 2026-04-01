@@ -41,18 +41,25 @@ class QuizAttempt extends Equatable {
 
   factory QuizAttempt.fromJson(Map<String, dynamic> json) {
     return QuizAttempt(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      quizId: json['quiz_id'] as String,
-      score: json['score'] as int,
-      totalQuestions: json['total_questions'] as int,
-      timeTakenSecs: json['time_taken_secs'] as int,
-      answers: (json['answers'] as List<dynamic>)
+      id: json['id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? '',
+      quizId: json['quiz_id'] as String? ?? '',
+      score: json['questions_correct'] as int? ?? json['score'] as int? ?? 0,
+      totalQuestions: json['questions_total'] as int? ??
+          json['total_questions'] as int? ?? 0,
+      timeTakenSecs: json['time_taken_seconds'] as int? ??
+          json['time_taken_secs'] as int? ?? 0,
+      answers: (json['answers_given'] as List<dynamic>? ??
+              json['answers'] as List<dynamic>? ?? [])
           .map((a) => a as int)
           .toList(),
-      holyPointsEarned: json['holy_points_earned'] as int? ?? 0,
-      faithCoinsEarned: json['faith_coins_earned'] as int? ?? 0,
-      completedAt: DateTime.parse(json['completed_at'] as String),
+      holyPointsEarned: json['holy_points_awarded'] as int? ??
+          json['holy_points_earned'] as int? ?? 0,
+      faithCoinsEarned: json['faith_coins_awarded'] as int? ??
+          json['faith_coins_earned'] as int? ?? 0,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'] as String)
+          : DateTime.now(),
     );
   }
 
@@ -85,3 +92,6 @@ class QuizAttempt extends Equatable {
         completedAt,
       ];
 }
+
+/// Alias kept for backwards-compatibility with existing imports.
+typedef QuizAttemptModel = QuizAttempt;

@@ -39,16 +39,21 @@ class QuestionModel extends Equatable {
   bool isCorrect(int selectedIndex) => selectedIndex == correctOptionIndex;
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    final opts = (json['options'] as List<dynamic>)
+    final rawOpts = (json['options'] as List<dynamic>? ?? [])
         .map((o) => o as String)
         .toList();
+    // Pad to exactly 4 options if DB returns fewer
+    final opts = rawOpts.length >= 4
+        ? rawOpts.take(4).toList()
+        : [...rawOpts, ...List.filled(4 - rawOpts.length, '')];
     return QuestionModel(
-      id: json['id'] as String,
-      quizId: json['quiz_id'] as String,
-      questionText: json['question_text'] as String,
+      id: json['id'] as String? ?? '',
+      quizId: json['quiz_id'] as String? ?? '',
+      questionText: json['question_text'] as String? ?? '',
       options: opts,
-      correctOptionIndex: json['correct_option_index'] as int,
-      explanation: json['explanation'] as String,
+      correctOptionIndex: json['correct_index'] as int? ??
+          json['correct_option_index'] as int? ?? 0,
+      explanation: json['explanation'] as String? ?? '',
       hintText: json['hint_text'] as String?,
       relatedVerseId: json['related_verse_id'] as String?,
       relatedSaintId: json['related_saint_id'] as String?,

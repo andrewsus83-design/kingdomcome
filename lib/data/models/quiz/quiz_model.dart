@@ -11,6 +11,8 @@ enum QuizCategory {
   prayer,
   catechism,
   seasonal,
+  moralTheology,
+  general,
 }
 
 extension QuizCategoryX on QuizCategory {
@@ -32,6 +34,47 @@ extension QuizCategoryX on QuizCategory {
         return 'Catechism';
       case QuizCategory.seasonal:
         return 'Seasonal';
+      case QuizCategory.moralTheology:
+        return 'Moral Theology';
+      case QuizCategory.general:
+        return 'General';
+    }
+  }
+
+  String get databaseKey {
+    switch (this) {
+      case QuizCategory.churchHistory:
+        return 'church_history';
+      case QuizCategory.prayer:
+        return 'prayers';
+      case QuizCategory.catechism:
+        return 'moral_theology';
+      case QuizCategory.seasonal:
+        return 'general';
+      case QuizCategory.moralTheology:
+        return 'moral_theology';
+      case QuizCategory.general:
+        return 'general';
+      default:
+        return name;
+    }
+  }
+
+  static QuizCategory fromDatabaseValue(String value) {
+    switch (value) {
+      case 'church_history':
+        return QuizCategory.churchHistory;
+      case 'prayers':
+        return QuizCategory.prayer;
+      case 'moral_theology':
+        return QuizCategory.moralTheology;
+      case 'general':
+        return QuizCategory.general;
+      default:
+        return QuizCategory.values.firstWhere(
+          (c) => c.name == value,
+          orElse: () => QuizCategory.general,
+        );
     }
   }
 }
@@ -82,21 +125,28 @@ class QuizModel extends Equatable {
   factory QuizModel.fromJson(Map<String, dynamic> json) {
     return QuizModel(
       id: json['id'] as String,
-      title: json['title'] as String,
-      category: QuizCategory.values.byName(json['category'] as String),
-      difficultyLevel: json['difficulty_level'] as int? ?? 1,
-      ageGroupMin: json['age_group_min'] as int? ?? 1,
-      completionHolyPoints: json['completion_holy_points'] as int? ?? 0,
-      completionFaithCoins: json['completion_faith_coins'] as int? ?? 0,
+      title: json['title'] as String? ?? '',
+      category: QuizCategoryX.fromDatabaseValue(
+          json['category'] as String? ?? 'general'),
+      difficultyLevel: json['difficulty'] as int? ??
+          json['difficulty_level'] as int? ?? 1,
+      ageGroupMin: json['min_age_group'] as int? ??
+          json['age_group_min'] as int? ?? 1,
+      completionHolyPoints: json['holy_points_reward'] as int? ??
+          json['completion_holy_points'] as int? ?? 0,
+      completionFaithCoins: json['faith_coins_reward'] as int? ??
+          json['completion_faith_coins'] as int? ?? 0,
       perfectScoreBonusHp: json['perfect_score_bonus_hp'] as int? ?? 0,
-      requiredBuildingType: json['required_building_type'] != null
-          ? BuildingType.values
-              .byName(json['required_building_type'] as String)
-          : null,
+      requiredBuildingType: json['required_building'] != null
+          ? BuildingType.fromDatabaseValue(json['required_building'] as String)
+          : json['required_building_type'] != null
+              ? BuildingType.fromDatabaseValue(
+                  json['required_building_type'] as String)
+              : null,
       liturgicalSeason: json['liturgical_season'] as String?,
-      questions: (json['questions'] as List<dynamic>?)
-              ?.map((q) =>
-                  QuestionModel.fromJson(q as Map<String, dynamic>))
+      questions: (json['quiz_questions'] as List<dynamic>? ??
+                  json['questions'] as List<dynamic>?)
+              ?.map((q) => QuestionModel.fromJson(q as Map<String, dynamic>))
               .toList() ??
           [],
       isActive: json['is_active'] as bool? ?? true,

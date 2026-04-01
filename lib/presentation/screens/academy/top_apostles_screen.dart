@@ -58,27 +58,24 @@ final _leaderboardProvider =
   if (user == null) return [];
 
   final supabase = Supabase.instance.client;
-  final column = period == _LeaderboardPeriod.thisWeek
-      ? 'weekly_holy_points'
-      : 'total_holy_points';
+  // Both periods use total_holy_points (weekly_holy_points doesn't exist yet)
+  const column = 'total_holy_points';
 
   // Fetch top 10
   final data = await supabase
       .from('user_profiles')
-      .select(
-          'user_id, profiles!inner(username, avatar_url, level), $column')
+      .select('id, username, avatar_url, $column')
       .order(column, ascending: false)
       .limit(10) as List<dynamic>;
 
   return data.asMap().entries.map((e) {
     final row = e.value as Map<String, dynamic>;
-    final profile = row['profiles'] as Map<String, dynamic>? ?? {};
     return _LeaderboardEntry(
       rank: e.key + 1,
-      userId: row['user_id'] as String? ?? '',
-      username: profile['username'] as String? ?? 'Pilgrim',
-      avatarUrl: profile['avatar_url'] as String?,
-      level: profile['level'] as int? ?? 1,
+      userId: row['id'] as String? ?? '',
+      username: row['username'] as String? ?? 'Pilgrim',
+      avatarUrl: row['avatar_url'] as String?,
+      level: 1,
       weeklyPoints: row[column] as int? ?? 0,
     );
   }).toList();

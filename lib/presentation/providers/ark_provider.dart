@@ -22,7 +22,11 @@ class ArkNotifier extends _$ArkNotifier {
     final user = ref.watch(currentUserProvider);
     if (user == null) return _mockNodes();
 
-    return _fetchNodesWithCompletion(user.id);
+    try {
+      return await _fetchNodesWithCompletion(user.id);
+    } catch (_) {
+      return _mockNodes();
+    }
   }
 
   /// Marks a node as complete and awards its resources to the user.

@@ -86,7 +86,7 @@ class QuestNotifier extends _$QuestNotifier {
 
     // Fetch already-completed quest IDs for today/week
     final completedData = await _supabase
-        .from('player_quests')
+        .from('quest_completions')
         .select('quest_id')
         .eq('user_id', userId)
         .gte('completed_at',

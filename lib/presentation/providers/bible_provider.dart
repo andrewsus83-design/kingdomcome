@@ -96,7 +96,7 @@ class ReadingProgressNotifier extends _$ReadingProgressNotifier {
     if (user == null) return [];
 
     final data = await _supabase
-        .from('reading_progress')
+        .from('user_reading_progress')
         .select()
         .eq('user_id', user.id)
         .order('last_read_at', ascending: false) as List<dynamic>;
@@ -116,13 +116,12 @@ class ReadingProgressNotifier extends _$ReadingProgressNotifier {
     if (user == null) return;
 
     final now = DateTime.now().toIso8601String();
-    await _supabase.from('reading_progress').upsert({
+    await _supabase.from('user_reading_progress').upsert({
       'user_id': user.id,
       'book_abbrev': bookAbbrev,
       'last_chapter_read': chapter,
       'last_verse_read': verse,
       'last_read_at': now,
-      'updated_at': now,
     }, onConflict: 'user_id,book_abbrev');
 
     // Update local state

@@ -49,9 +49,9 @@ class QuizNotifier extends _$QuizNotifier {
     final data = await _supabase
         .from('quizzes')
         .select('*, quiz_questions(*)')
-        .lte('age_group_min', ageGroup)
+        .lte('min_age_group', ageGroup)
         .eq('is_active', true)
-        .order('difficulty_level')
+        .order('sort_order')
         .limit(30) as List<dynamic>;
 
     return data

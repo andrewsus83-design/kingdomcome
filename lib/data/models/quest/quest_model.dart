@@ -68,40 +68,46 @@ class QuestModel extends Equatable {
   factory QuestModel.fromJson(Map<String, dynamic> json) {
     return QuestModel(
       id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      category: QuestCategory.values.byName(json['category'] as String),
-      difficulty: QuestDifficulty.values.byName(json['difficulty'] as String),
-      verificationType: QuestVerificationType.values
-          .byName(json['verification_type'] as String),
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      category: QuestCategoryX.fromDatabaseValue(
+          json['category'] as String? ?? 'prayer'),
+      difficulty: QuestDifficultyX.fromDatabaseValue(
+          json['difficulty'] as String? ?? 'easy'),
+      verificationType: QuestVerificationTypeX.fromDatabaseValue(
+          json['verification_type'] as String? ?? 'self_report'),
       verificationRequiredSeconds:
           json['verification_required_seconds'] as int? ?? 0,
       holyPointsReward: json['holy_points_reward'] as int? ?? 0,
       faithCoinsReward: json['faith_coins_reward'] as int? ?? 0,
       graceReward: json['grace_reward'] as int? ?? 0,
       blessingsReward: json['blessings_reward'] as int? ?? 0,
-      isRepeatable: json['is_repeatable'] as bool? ?? true,
-      repeatFrequency: json['repeat_frequency'] != null
-          ? QuestRepeatFrequency.values
-              .byName(json['repeat_frequency'] as String)
-          : null,
-      requiredBuildingType: json['required_building_type'] != null
-          ? BuildingType.values
-              .byName(json['required_building_type'] as String)
-          : null,
-      requiredLevel: json['required_level'] as int?,
+      isRepeatable: json['repeat_frequency'] != null,
+      repeatFrequency: QuestRepeatFrequencyX.fromDatabaseValue(
+          json['repeat_frequency'] as String?),
+      requiredBuildingType:
+          json['required_building'] != null
+              ? BuildingType.fromDatabaseValue(
+                  json['required_building'] as String)
+              : json['required_building_type'] != null
+                  ? BuildingType.fromDatabaseValue(
+                      json['required_building_type'] as String)
+                  : null,
+      requiredLevel: json['min_level'] as int? ?? json['required_level'] as int?,
       liturgicalSeason: json['liturgical_season'] as String?,
       steps: (json['steps'] as List<dynamic>?)
               ?.map((s) => s as String)
               .toList() ??
           [],
-      iconAssetPath: json['icon_asset_path'] as String? ??
-          'assets/images/quests/default.png',
+      iconAssetPath: json['icon_name'] != null
+          ? 'assets/images/quests/${json['icon_name']}.png'
+          : json['icon_asset_path'] as String? ??
+              'assets/images/quests/default.png',
       availableFrom: json['available_from'] != null
-          ? DateTime.parse(json['available_from'] as String)
+          ? DateTime.tryParse(json['available_from'] as String)
           : null,
       availableUntil: json['available_until'] != null
-          ? DateTime.parse(json['available_until'] as String)
+          ? DateTime.tryParse(json['available_until'] as String)
           : null,
       sortOrder: json['sort_order'] as int? ?? 0,
       isActive: json['is_active'] as bool? ?? true,
