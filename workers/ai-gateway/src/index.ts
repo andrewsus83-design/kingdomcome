@@ -3,6 +3,7 @@
  *
  * Routes AI requests to the appropriate upstream service:
  *   POST /chat                        → Magisterium AI (Catholic chat)
+ *   POST /analyze-artwork             → Claude Vision API (Masterpiece Scanner)
  *   POST /generate-image              → Modal.com Flux Schnell (arts & crafts)
  *   POST /generate-character          → OpenArt AI (saint/character art)
  *   POST /generate-video              → Runway Gen 4.5 (Bible story videos)
@@ -194,6 +195,163 @@ export default {
 };
 
 // ── Route handlers ────────────────────────────────────────────────────────────
+
+// ── Per-user daily artwork scan rate limiter (10 scans/day) ─────────────────
+
+const artworkScanMap = new Map<string, { count: number; resetAt: number }>();
+const ARTWORK_SCAN_LIMIT = 10;
+const ARTWORK_SCAN_WINDOW_MS = 24 * 60 * 60_000; // 24 hours
+
+function checkArtworkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = artworkScanMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    artworkScanMap.set(userId, { count: 1, resetAt: now + ARTWORK_SCAN_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= ARTWORK_SCAN_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
+async function handleAnalyzeArtwork(
+  request: Request,
+  env: Env,
+  userId: string
+): Promise<Response> {
+  // Per-user daily scan limit
+  if (!checkArtworkRateLimit(userId)) {
+    return jsonError(
+      "Daily scan limit reached (10 per day). Come back tomorrow!",
+      429
+    );
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return jsonError("Invalid JSON body.");
+  }
+
+  const base64Image = typeof body.image === "string" ? body.image : "";
+  const mimeType =
+    typeof body.mimeType === "string" ? body.mimeType : "image/jpeg";
+
+  if (!base64Image) {
+    return jsonError("Field 'image' (base64 encoded) is required.");
+  }
+
+  const analysisPrompt = `You are analyzing a child's artwork for a Catholic educational app.
+Analyze this image and respond ONLY with a JSON object (no markdown, no explanation) with these exact fields:
+{
+  "type": one of "coloring" | "drawing" | "papercraft" | "craft",
+  "effortLevel": integer from 1 to 5 (1=minimal, 5=exceptional),
+  "catholicTheme": true or false,
+  "themeDetail": string — if catholicTheme is true, briefly identify the theme (e.g. "nativity scene", "cross", "rosary", "saint portrait"); otherwise empty string,
+  "completionPercent": integer 0–100 representing how complete the artwork appears,
+  "encouragingMessage": a warm, brief (1 sentence) encouraging message for the child about their artwork
+}
+Be generous with effort ratings for children. If the image is unclear, default to type "drawing", effortLevel 3, catholicTheme false.`;
+
+  try {
+    const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-opus-4-5",
+        max_tokens: 512,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: mimeType,
+                  data: base64Image,
+                },
+              },
+              {
+                type: "text",
+                text: analysisPrompt,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    if (!claudeResponse.ok) {
+      const errText = await claudeResponse.text();
+      console.error("Claude Vision error:", claudeResponse.status, errText);
+      return jsonError("Artwork analysis service temporarily unavailable.", 502);
+    }
+
+    const claudeData = (await claudeResponse.json()) as {
+      content: Array<{ type: string; text: string }>;
+    };
+
+    const rawText =
+      claudeData.content?.find((c) => c.type === "text")?.text ?? "{}";
+
+    // Parse the JSON response
+    let analysis: Record<string, unknown>;
+    try {
+      analysis = JSON.parse(rawText) as Record<string, unknown>;
+    } catch {
+      // Claude might have wrapped it — try extracting JSON from the text
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        return jsonError("Could not parse artwork analysis.", 502);
+      }
+      analysis = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
+    }
+
+    // Sanitise and validate
+    const type = ["coloring", "drawing", "papercraft", "craft"].includes(
+      analysis.type as string
+    )
+      ? (analysis.type as string)
+      : "drawing";
+
+    const effortLevel = Math.min(
+      5,
+      Math.max(1, Math.round((analysis.effortLevel as number) ?? 3))
+    );
+    const catholicTheme = analysis.catholicTheme === true;
+    const themeDetail =
+      catholicTheme && typeof analysis.themeDetail === "string"
+        ? analysis.themeDetail.slice(0, 100)
+        : "";
+    const completionPercent = Math.min(
+      100,
+      Math.max(0, Math.round((analysis.completionPercent as number) ?? 75))
+    );
+    const encouragingMessage =
+      typeof analysis.encouragingMessage === "string"
+        ? analysis.encouragingMessage.slice(0, 200)
+        : "Great work — keep creating for God!";
+
+    return jsonOk({
+      type,
+      effortLevel,
+      catholicTheme,
+      themeDetail,
+      completionPercent,
+      encouragingMessage,
+    });
+  } catch (err) {
+    console.error("Artwork analysis error:", err);
+    return jsonError("Internal server error.", 500);
+  }
+}
+
 
 async function handleChat(request: Request, env: Env, ageGroup: 1 | 2 | 3): Promise<Response> {
   let body: unknown;
