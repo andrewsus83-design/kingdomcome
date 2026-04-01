@@ -9,8 +9,15 @@ import modal
 app = modal.App("kingdom-come-tts")
 
 image = (
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install("bark", "scipy", "numpy")
+    modal.Image.from_registry(
+        "pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime",
+        add_python="3.11",
+    )
+    .env({"DEBIAN_FRONTEND": "noninteractive"})
+    .run_commands(
+        "pip install --upgrade pip",
+        "pip install bark scipy numpy",
+    )
 )
 
 
