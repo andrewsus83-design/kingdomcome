@@ -18,9 +18,6 @@ R2_ASSETS_BASE_URL = "https://assets.kingdomcomeapp.com"
 binding = "ASSETS_BUCKET"
 bucket_name = "kingdom-come-assets"
 
-[limits]
-cpu_ms = 50
-
 [[rules]]
 type = "ESModule"
 globs = ["**/*.ts"]
