@@ -1,0 +1,20 @@
+name = "kingdom-come-ai-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+MAGISTERIUM_API_KEY = ""
+ANTHROPIC_API_KEY = ""
+OPENART_API_KEY = ""
+MODAL_API_KEY = ""
+RUNWAY_API_KEY = ""
+HEYGEN_API_KEY = ""
+WORLD_ANVIL_API_KEY = ""
+
+[limits]
+cpu_ms = 50
+
+[[rules]]
+type = "ESModule"
+globs = ["**/*.ts"]
