@@ -324,7 +324,7 @@ class _UpgradeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final costs = kBuildingCosts[building.type.name];
+    final costs = kBuildingCosts[building.type.databaseValue];
     final nextLevelCost =
         costs != null && building.level < costs.length ? costs[building.level] : null;
 

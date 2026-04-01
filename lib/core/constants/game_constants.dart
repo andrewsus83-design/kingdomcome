@@ -56,30 +56,31 @@ final class ResourceReward extends Equatable {
 // Building types
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// All 10 building type identifiers used as map keys.
-abstract final class BuildingType {
+/// All 10 building type identifiers — matches the DB `building_type` enum.
+/// Use [BuildingType.databaseValue] from building_type.dart for dynamic lookups.
+abstract final class BuildingKeys {
   static const String cathedral = 'cathedral';
   static const String monastery = 'monastery';
-  static const String library = 'library';
+  static const String school = 'school';
   static const String chapel = 'chapel';
   static const String garden = 'garden';
   static const String scriptorium = 'scriptorium';
-  static const String almsHouse = 'alms_house';
-  static const String belltower = 'belltower';
-  static const String fountain = 'fountain';
-  static const String pilgrimageRoute = 'pilgrimage_route';
+  static const String parishHall = 'parish_hall';
+  static const String bellTower = 'bell_tower';
+  static const String oratory = 'oratory';
+  static const String workshop = 'workshop';
 
   static const List<String> all = [
     cathedral,
     monastery,
-    library,
+    school,
     chapel,
     garden,
     scriptorium,
-    almsHouse,
-    belltower,
-    fountain,
-    pilgrimageRoute,
+    parishHall,
+    bellTower,
+    oratory,
+    workshop,
   ];
 }
 
@@ -92,70 +93,70 @@ abstract final class BuildingType {
 /// Index 0 = Level 1 construction cost.
 /// Index 4 = Level 5 upgrade cost.
 const Map<String, List<BuildingCost>> kBuildingCosts = {
-  BuildingType.cathedral: [
+  BuildingKeys.cathedral: [
     BuildingCost(holyPoints: 0, faithCoins: 100, grace: 20),      // L1
     BuildingCost(holyPoints: 50, faithCoins: 250, grace: 50),     // L2
     BuildingCost(holyPoints: 150, faithCoins: 500, grace: 100),   // L3
     BuildingCost(holyPoints: 350, faithCoins: 900, grace: 200),   // L4
     BuildingCost(holyPoints: 700, faithCoins: 1600, grace: 400),  // L5
   ],
-  BuildingType.monastery: [
+  BuildingKeys.monastery: [
     BuildingCost(holyPoints: 0, faithCoins: 80, grace: 15),
     BuildingCost(holyPoints: 40, faithCoins: 200, grace: 40),
     BuildingCost(holyPoints: 120, faithCoins: 420, grace: 80),
     BuildingCost(holyPoints: 280, faithCoins: 750, grace: 160),
     BuildingCost(holyPoints: 560, faithCoins: 1350, grace: 320),
   ],
-  BuildingType.library: [
+  BuildingKeys.school: [
     BuildingCost(holyPoints: 0, faithCoins: 60, grace: 10),
     BuildingCost(holyPoints: 30, faithCoins: 150, grace: 30),
     BuildingCost(holyPoints: 90, faithCoins: 320, grace: 60),
     BuildingCost(holyPoints: 210, faithCoins: 580, grace: 120),
     BuildingCost(holyPoints: 420, faithCoins: 1050, grace: 240),
   ],
-  BuildingType.chapel: [
+  BuildingKeys.chapel: [
     BuildingCost(holyPoints: 0, faithCoins: 40, grace: 8),
     BuildingCost(holyPoints: 20, faithCoins: 100, grace: 20),
     BuildingCost(holyPoints: 60, faithCoins: 220, grace: 40),
     BuildingCost(holyPoints: 140, faithCoins: 400, grace: 80),
     BuildingCost(holyPoints: 280, faithCoins: 720, grace: 160),
   ],
-  BuildingType.garden: [
+  BuildingKeys.garden: [
     BuildingCost(holyPoints: 0, faithCoins: 30, grace: 5),
     BuildingCost(holyPoints: 15, faithCoins: 75, grace: 15),
     BuildingCost(holyPoints: 45, faithCoins: 160, grace: 30),
     BuildingCost(holyPoints: 105, faithCoins: 290, grace: 60),
     BuildingCost(holyPoints: 210, faithCoins: 520, grace: 120),
   ],
-  BuildingType.scriptorium: [
+  BuildingKeys.scriptorium: [
     BuildingCost(holyPoints: 0, faithCoins: 70, grace: 12),
     BuildingCost(holyPoints: 35, faithCoins: 175, grace: 35),
     BuildingCost(holyPoints: 105, faithCoins: 375, grace: 70),
     BuildingCost(holyPoints: 245, faithCoins: 675, grace: 140),
     BuildingCost(holyPoints: 490, faithCoins: 1200, grace: 280),
   ],
-  BuildingType.almsHouse: [
+  BuildingKeys.parishHall: [
     BuildingCost(holyPoints: 0, faithCoins: 50, grace: 10),
     BuildingCost(holyPoints: 25, faithCoins: 125, grace: 25),
     BuildingCost(holyPoints: 75, faithCoins: 270, grace: 50),
     BuildingCost(holyPoints: 175, faithCoins: 490, grace: 100),
     BuildingCost(holyPoints: 350, faithCoins: 880, grace: 200),
   ],
-  BuildingType.belltower: [
+  BuildingKeys.bellTower: [
     BuildingCost(holyPoints: 0, faithCoins: 45, grace: 8),
     BuildingCost(holyPoints: 22, faithCoins: 112, grace: 22),
     BuildingCost(holyPoints: 66, faithCoins: 240, grace: 44),
     BuildingCost(holyPoints: 154, faithCoins: 432, grace: 88),
     BuildingCost(holyPoints: 308, faithCoins: 776, grace: 176),
   ],
-  BuildingType.fountain: [
+  BuildingKeys.oratory: [
     BuildingCost(holyPoints: 0, faithCoins: 35, grace: 6),
     BuildingCost(holyPoints: 18, faithCoins: 88, grace: 18),
     BuildingCost(holyPoints: 54, faithCoins: 188, grace: 36),
     BuildingCost(holyPoints: 126, faithCoins: 338, grace: 72),
     BuildingCost(holyPoints: 252, faithCoins: 608, grace: 144),
   ],
-  BuildingType.pilgrimageRoute: [
+  BuildingKeys.workshop: [
     BuildingCost(holyPoints: 0, faithCoins: 120, grace: 25),
     BuildingCost(holyPoints: 60, faithCoins: 300, grace: 60),
     BuildingCost(holyPoints: 180, faithCoins: 640, grace: 120),
@@ -168,7 +169,8 @@ const Map<String, List<BuildingCost>> kBuildingCosts = {
 // Quest categories
 // ─────────────────────────────────────────────────────────────────────────────
 
-abstract final class QuestCategory {
+/// Renamed to avoid conflict with the [QuestCategory] enum in quest_category.dart.
+abstract final class QuestCategoryKeys {
   static const String dailyPrayer = 'daily_prayer';
   static const String scripture = 'scripture';
   static const String sacraments = 'sacraments';
@@ -186,7 +188,7 @@ abstract final class QuestCategory {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Map<String, Map<String, ResourceReward>> kQuestRewards = {
-  QuestCategory.dailyPrayer: {
+  QuestCategoryKeys.dailyPrayer: {
     'easy': ResourceReward(
         holyPoints: 10, faithCoins: 5, grace: 2, blessings: 1, xp: 20),
     'medium': ResourceReward(
@@ -194,7 +196,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 40, faithCoins: 20, grace: 8, blessings: 4, xp: 80),
   },
-  QuestCategory.scripture: {
+  QuestCategoryKeys.scripture: {
     'easy': ResourceReward(
         holyPoints: 15, faithCoins: 8, grace: 3, blessings: 1, xp: 25),
     'medium': ResourceReward(
@@ -202,7 +204,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 60, faithCoins: 30, grace: 12, blessings: 6, xp: 100),
   },
-  QuestCategory.sacraments: {
+  QuestCategoryKeys.sacraments: {
     'easy': ResourceReward(
         holyPoints: 20, faithCoins: 10, grace: 5, blessings: 2, xp: 30),
     'medium': ResourceReward(
@@ -210,7 +212,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 80, faithCoins: 40, grace: 20, blessings: 8, xp: 120),
   },
-  QuestCategory.corporal: {
+  QuestCategoryKeys.corporal: {
     'easy': ResourceReward(
         holyPoints: 12, faithCoins: 6, grace: 3, blessings: 2, xp: 22),
     'medium': ResourceReward(
@@ -218,7 +220,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 50, faithCoins: 25, grace: 12, blessings: 8, xp: 90),
   },
-  QuestCategory.spiritual: {
+  QuestCategoryKeys.spiritual: {
     'easy': ResourceReward(
         holyPoints: 12, faithCoins: 6, grace: 3, blessings: 2, xp: 22),
     'medium': ResourceReward(
@@ -226,7 +228,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 50, faithCoins: 25, grace: 12, blessings: 8, xp: 90),
   },
-  QuestCategory.trivia: {
+  QuestCategoryKeys.trivia: {
     'easy': ResourceReward(
         holyPoints: 8, faithCoins: 4, grace: 1, blessings: 1, xp: 15),
     'medium': ResourceReward(
@@ -234,7 +236,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 35, faithCoins: 18, grace: 6, blessings: 4, xp: 65),
   },
-  QuestCategory.craft: {
+  QuestCategoryKeys.craft: {
     'easy': ResourceReward(
         holyPoints: 10, faithCoins: 5, grace: 2, blessings: 2, xp: 20),
     'medium': ResourceReward(
@@ -242,7 +244,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 45, faithCoins: 22, grace: 10, blessings: 8, xp: 85),
   },
-  QuestCategory.pilgrimage: {
+  QuestCategoryKeys.pilgrimage: {
     'easy': ResourceReward(
         holyPoints: 25, faithCoins: 12, grace: 5, blessings: 3, xp: 40),
     'medium': ResourceReward(
@@ -250,7 +252,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 110, faithCoins: 55, grace: 25, blessings: 15, xp: 175),
   },
-  QuestCategory.liturgicalSeason: {
+  QuestCategoryKeys.liturgicalSeason: {
     'easy': ResourceReward(
         holyPoints: 15, faithCoins: 8, grace: 4, blessings: 3, xp: 28),
     'medium': ResourceReward(
@@ -258,7 +260,7 @@ const Map<String, Map<String, ResourceReward>> kQuestRewards = {
     'hard': ResourceReward(
         holyPoints: 70, faithCoins: 35, grace: 15, blessings: 12, xp: 120),
   },
-  QuestCategory.heroicVirtue: {
+  QuestCategoryKeys.heroicVirtue: {
     'easy': ResourceReward(
         holyPoints: 30, faithCoins: 15, grace: 8, blessings: 5, xp: 50),
     'medium': ResourceReward(
@@ -385,16 +387,16 @@ const List<int> kLevelThresholds = [
 
 /// Maps building type → minimum player level required to begin construction.
 const Map<String, int> kBuildingUnlockLevels = {
-  BuildingType.chapel: 1,            // Available from the start
-  BuildingType.garden: 2,            // Unlocked very early
-  BuildingType.fountain: 3,
-  BuildingType.belltower: 5,
-  BuildingType.almsHouse: 7,
-  BuildingType.library: 10,
-  BuildingType.scriptorium: 13,
-  BuildingType.monastery: 17,
-  BuildingType.cathedral: 22,
-  BuildingType.pilgrimageRoute: 30,  // Late-game prestige building
+  BuildingKeys.chapel: 1,            // Available from the start
+  BuildingKeys.garden: 2,            // Unlocked very early
+  BuildingKeys.oratory: 3,
+  BuildingKeys.bellTower: 5,
+  BuildingKeys.parishHall: 7,
+  BuildingKeys.school: 10,
+  BuildingKeys.scriptorium: 13,
+  BuildingKeys.monastery: 17,
+  BuildingKeys.cathedral: 22,
+  BuildingKeys.workshop: 30,         // Late-game prestige building
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

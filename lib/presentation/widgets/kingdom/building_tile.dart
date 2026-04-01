@@ -133,20 +133,20 @@ class _FallbackSprite extends StatelessWidget {
         return Icons.account_balance;
       case BuildingType.school:
         return Icons.school;
-      case BuildingType.artStudio:
+      case BuildingType.workshop:
         return Icons.palette;
-      case BuildingType.confessional:
+      case BuildingType.chapel:
         return Icons.meeting_room;
       case BuildingType.bellTower:
         return Icons.notifications;
-      case BuildingType.townSquare:
+      case BuildingType.parishHall:
         return Icons.people;
       case BuildingType.scriptorium:
         return Icons.menu_book;
-      case BuildingType.shrine:
+      case BuildingType.oratory:
         return Icons.auto_awesome;
-      case BuildingType.fortressWall:
-        return Icons.security;
+      case BuildingType.garden:
+        return Icons.park;
     }
   }
 

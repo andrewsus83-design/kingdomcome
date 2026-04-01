@@ -76,19 +76,19 @@ class KingdomEntity {
         return 300;
       case BuildingType.school:
         return 200;
-      case BuildingType.artStudio:
+      case BuildingType.workshop:
         return 150;
-      case BuildingType.confessional:
+      case BuildingType.chapel:
         return 100;
       case BuildingType.bellTower:
         return 75;
-      case BuildingType.townSquare:
+      case BuildingType.parishHall:
         return 250;
       case BuildingType.scriptorium:
         return 175;
-      case BuildingType.shrine:
+      case BuildingType.oratory:
         return 80;
-      case BuildingType.fortressWall:
+      case BuildingType.garden:
         return 120;
     }
   }
@@ -96,21 +96,21 @@ class KingdomEntity {
   /// Returns the minimum kingdom level required to build [type].
   static int requiredKingdomLevelFor(BuildingType type) {
     switch (type) {
-      case BuildingType.shrine:
+      case BuildingType.oratory:
         return 1;
       case BuildingType.bellTower:
         return 1;
-      case BuildingType.confessional:
+      case BuildingType.chapel:
         return 2;
       case BuildingType.school:
         return 2;
-      case BuildingType.fortressWall:
+      case BuildingType.garden:
         return 3;
-      case BuildingType.artStudio:
+      case BuildingType.workshop:
         return 3;
       case BuildingType.scriptorium:
         return 4;
-      case BuildingType.townSquare:
+      case BuildingType.parishHall:
         return 4;
       case BuildingType.monastery:
         return 5;
