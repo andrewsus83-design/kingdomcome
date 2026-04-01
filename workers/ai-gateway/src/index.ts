@@ -4,32 +4,34 @@
  * Routes AI requests to the appropriate upstream service:
  *   POST /chat                        → Magisterium AI (Catholic chat)
  *   POST /generate-image              → Modal.com Flux Schnell (arts & crafts)
- *   POST /generate-character          → OpenArt AI (saint/character art)
+ *   GET  /character/:slug             → R2 asset URL lookup (character art)
  *   POST /generate-video              → Runway Gen 4.5 (Bible story videos)
  *   POST /create-avatar-video         → HeyGen API (avatar storyteller)
  *   POST /orchestrate                 → Claude API (Anthropic, complex workflows)
+ *   POST /analyze-artwork             → Claude Vision (Masterpiece Scanner)
  *   GET  /wiki/:articleId             → World Anvil API (wiki content)
- *   POST /audio/narrate-verse         → ElevenLabs TTS (Bible verse read-aloud)
- *   POST /audio/narrate-story         → ElevenLabs TTS (Bible story panel narration)
- *   POST /audio/saint-voice           → ElevenLabs TTS (saint narrator voices)
- *   POST /music/ambient               → MusicGen via Modal.com (liturgical ambient)
- *   POST /music/victory-jingle        → MusicGen via Modal.com (quest victory jingle)
+ *   POST /audio/narrate-verse         → Bark TTS via Modal.com
+ *   POST /audio/narrate-story         → Bark TTS via Modal.com
+ *   POST /audio/saint-voice           → Bark TTS via Modal.com
+ *   POST /music/ambient               → MusicGen via Modal.com
+ *   POST /music/victory-jingle        → MusicGen via Modal.com
  */
 
 import { filterResponse, validateChatRequest } from "./content-filter";
-import { handleAudioRequest } from "./suno";
+import { handleAudioRequest } from "./audio";
 
 // ── Env bindings ─────────────────────────────────────────────────────────────
 
 export interface Env {
   MAGISTERIUM_API_KEY: string;
   ANTHROPIC_API_KEY: string;
-  OPENART_API_KEY: string;
   MODAL_API_KEY: string;
+  MODAL_TTS_URL: string;
+  MODAL_MUSIC_URL: string;
   RUNWAY_API_KEY: string;
   HEYGEN_API_KEY: string;
   WORLD_ANVIL_API_KEY: string;
-  ELEVENLABS_API_KEY: string;
+  R2_ASSETS_BASE_URL: string; // e.g. https://assets.kingdomcome.app
 }
 
 // ── Rate limiting (in-memory per isolate — coarse guard) ──────────────────────
@@ -136,9 +138,10 @@ export default {
       return handleGenerateImage(request, env, ageGroup);
     }
 
-    // POST /generate-character
-    if (pathname === "/generate-character" && request.method === "POST") {
-      return handleGenerateCharacter(request, env, ageGroup);
+    // GET /character/:category/:slug  → R2 asset URLs
+    const charMatch = pathname.match(/^\/character\/([^/]+)\/([^/]+)$/);
+    if (charMatch && request.method === "GET") {
+      return handleCharacterAssets(charMatch[1], charMatch[2], env);
     }
 
     // POST /generate-video
@@ -467,53 +470,28 @@ async function handleGenerateImage(
   }
 }
 
-async function handleGenerateCharacter(
-  request: Request,
-  env: Env,
-  _ageGroup: 1 | 2 | 3
-): Promise<Response> {
-  let body: Record<string, unknown>;
-  try {
-    body = (await request.json()) as Record<string, unknown>;
-  } catch {
-    return jsonError("Invalid JSON body.");
+function handleCharacterAssets(
+  category: string,
+  slug: string,
+  env: Env
+): Response {
+  // Validate category
+  const validCategories = ["old-testament", "new-testament", "saints"];
+  if (!validCategories.includes(category)) {
+    return jsonError("Invalid category. Use: old-testament, new-testament, saints.", 400);
   }
 
-  const saintName = typeof body.saintName === "string" ? body.saintName.trim() : "";
-  const style = typeof body.style === "string" ? body.style : "icon painting";
-  if (!saintName) return jsonError("Field 'saintName' is required.");
+  const base = `${env.R2_ASSETS_BASE_URL}/characters/${category}/${slug}`;
 
-  const prompt =
-    `Portrait of ${saintName}, Catholic saint, ${style}, holy nimbus, ` +
-    `medieval iconography, gold leaf, rich colors, sacred art, child-friendly`;
-
-  try {
-    const openArtResponse = await fetch("https://openart.ai/api/v1/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${env.OPENART_API_KEY}`,
-      },
-      body: JSON.stringify({
-        prompt,
-        negative_prompt: "violent, scary, inappropriate, modern, photorealistic",
-        width: 512,
-        height: 512,
-        num_images: 1,
-        model: "openart-xl",
-      }),
-    });
-
-    if (!openArtResponse.ok) {
-      return jsonError("Character generation service temporarily unavailable.", 502);
-    }
-
-    const data = await openArtResponse.json();
-    return jsonOk(data);
-  } catch (err) {
-    console.error("Character generation error:", err);
-    return jsonError("Internal server error.", 500);
-  }
+  return jsonOk({
+    slug,
+    category,
+    portrait: `${base}/portrait.png`,
+    card: `${base}/card.png`,
+    avatar: `${base}/avatar.png`,
+    fullBody: `${base}/full-body.png`,
+    abilityIcon: category === "saints" ? `${base}/ability-icon.png` : null,
+  });
 }
 
 async function handleGenerateVideo(

@@ -7,13 +7,12 @@ compatibility_flags = ["nodejs_compat"]
 MAGISTERIUM_API_KEY = ""
 ANTHROPIC_API_KEY = ""
 MODAL_API_KEY = ""
+MODAL_TTS_URL = ""
+MODAL_MUSIC_URL = ""
 RUNWAY_API_KEY = ""
 HEYGEN_API_KEY = ""
 WORLD_ANVIL_API_KEY = ""
-ELEVENLABS_API_KEY = ""
-OPENART_API_KEY = ""
-MODAL_TTS_URL = ""
-MODAL_MUSIC_URL = ""
+R2_ASSETS_BASE_URL = "https://assets.kingdomcome.app"
 
 [limits]
 cpu_ms = 50
