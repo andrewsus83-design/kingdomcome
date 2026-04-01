@@ -401,7 +401,7 @@ class _GridTile extends StatelessWidget {
   Color get _buildingColor {
     if (building == null) return Colors.transparent;
     switch (building!.type) {
-      case BuildingType.church:
+      case BuildingType.chapel:
         return const Color(0xFF8B4DB8);
       case BuildingType.monastery:
         return const Color(0xFF5A6E4A);
@@ -409,14 +409,18 @@ class _GridTile extends StatelessWidget {
         return const Color(0xFF4A6E8B);
       case BuildingType.garden:
         return const Color(0xFF4A8B5A);
-      case BuildingType.library:
+      case BuildingType.scriptorium:
         return const Color(0xFF8B6B4A);
-      case BuildingType.tower:
+      case BuildingType.bellTower:
         return const Color(0xFF6B4A4A);
-      case BuildingType.well:
+      case BuildingType.oratory:
         return const Color(0xFF4A7B8B);
-      case BuildingType.market:
+      case BuildingType.workshop:
         return const Color(0xFF8B7A4A);
+      case BuildingType.cathedral:
+        return const Color(0xFF6B3A8B);
+      case BuildingType.parishHall:
+        return const Color(0xFF4A5A6E);
     }
   }
 
@@ -473,7 +477,7 @@ class _LegoBuilding extends StatelessWidget {
 
   Color get _primaryColor {
     switch (building.type) {
-      case BuildingType.church:
+      case BuildingType.chapel:
         return const Color(0xFFB87FD4);
       case BuildingType.monastery:
         return const Color(0xFF82A872);
@@ -481,37 +485,22 @@ class _LegoBuilding extends StatelessWidget {
         return const Color(0xFF6FA4C8);
       case BuildingType.garden:
         return const Color(0xFF72C882);
-      case BuildingType.library:
+      case BuildingType.scriptorium:
         return const Color(0xFFC8A47A);
-      case BuildingType.tower:
+      case BuildingType.bellTower:
         return const Color(0xFFC87272);
-      case BuildingType.well:
+      case BuildingType.oratory:
         return const Color(0xFF72B4C8);
-      case BuildingType.market:
+      case BuildingType.workshop:
         return const Color(0xFFC8BA72);
+      case BuildingType.cathedral:
+        return const Color(0xFF9B6FD4);
+      case BuildingType.parishHall:
+        return const Color(0xFF6FA4C8);
     }
   }
 
-  String get _buildingEmoji {
-    switch (building.type) {
-      case BuildingType.church:
-        return '⛪';
-      case BuildingType.monastery:
-        return '🏯';
-      case BuildingType.school:
-        return '🏫';
-      case BuildingType.garden:
-        return '🌿';
-      case BuildingType.library:
-        return '📚';
-      case BuildingType.tower:
-        return '🗼';
-      case BuildingType.well:
-        return '🪣';
-      case BuildingType.market:
-        return '🏪';
-    }
-  }
+  String get _buildingEmoji => building.type.emoji;
 
   @override
   Widget build(BuildContext context) {
@@ -1022,26 +1011,7 @@ class _BuildingOption extends StatelessWidget {
 
   const _BuildingOption({required this.type, required this.onTap});
 
-  String get _emoji {
-    switch (type) {
-      case BuildingType.church:
-        return '⛪';
-      case BuildingType.monastery:
-        return '🏯';
-      case BuildingType.school:
-        return '🏫';
-      case BuildingType.garden:
-        return '🌿';
-      case BuildingType.library:
-        return '📚';
-      case BuildingType.tower:
-        return '🗼';
-      case BuildingType.well:
-        return '🪣';
-      case BuildingType.market:
-        return '🏪';
-    }
-  }
+  String get _emoji => type.emoji;
 
   @override
   Widget build(BuildContext context) {

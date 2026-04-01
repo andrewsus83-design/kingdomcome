@@ -64,21 +64,11 @@ class ResourceNotifier extends _$ResourceNotifier {
   Future<ResourceModel> _fetchResources(String userId) async {
     final data = await _supabase
         .from('user_profiles')
-        .select('user_id, holy_points, faith_coins, blessings, grace, updated_at')
-        .eq('user_id', userId)
+        .select('id, total_holy_points, faith_coins, blessings, grace, last_active_at')
+        .eq('id', userId)
         .maybeSingle();
 
     if (data == null) {
-      // New user — seed default row
-      final now = DateTime.now().toIso8601String();
-      await _supabase.from('user_profiles').upsert({
-        'user_id': userId,
-        'holy_points': 0,
-        'faith_coins': 0,
-        'blessings': 0,
-        'grace': 0,
-        'updated_at': now,
-      });
       return ResourceModel(
         userId: userId,
         holyPoints: 0,
@@ -96,8 +86,8 @@ class ResourceNotifier extends _$ResourceNotifier {
     _realtimeSub?.cancel();
     _realtimeSub = _supabase
         .from('user_profiles')
-        .stream(primaryKey: ['user_id'])
-        .eq('user_id', userId)
+        .stream(primaryKey: ['id'])
+        .eq('id', userId)
         .listen((rows) {
           if (rows.isNotEmpty) {
             state = AsyncData(ResourceModel.fromJson(rows.first));

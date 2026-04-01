@@ -31,14 +31,21 @@ class UserSaintModel extends Equatable {
       userId: json['user_id'] as String,
       saintId: json['saint_id'] as String,
       unlockedAt: DateTime.parse(json['unlocked_at'] as String),
+      // is_active is derived from user_profiles.active_saint_id — default false
       isActive: json['is_active'] as bool? ?? false,
-      abilityActivatedAt: json['ability_activated_at'] != null
-          ? DateTime.parse(json['ability_activated_at'] as String)
-          : null,
-      abilityExpiresAt: json['ability_expires_at'] != null
-          ? DateTime.parse(json['ability_expires_at'] as String)
-          : null,
-      timesActivated: json['times_activated'] as int? ?? 0,
+      // DB columns: active_ability_started_at / active_ability_ends_at
+      abilityActivatedAt: json['active_ability_started_at'] != null
+          ? DateTime.parse(json['active_ability_started_at'] as String)
+          : json['ability_activated_at'] != null
+              ? DateTime.parse(json['ability_activated_at'] as String)
+              : null,
+      abilityExpiresAt: json['active_ability_ends_at'] != null
+          ? DateTime.parse(json['active_ability_ends_at'] as String)
+          : json['ability_expires_at'] != null
+              ? DateTime.parse(json['ability_expires_at'] as String)
+              : null,
+      timesActivated: json['total_activations'] as int? ??
+          json['times_activated'] as int? ?? 0,
     );
   }
 

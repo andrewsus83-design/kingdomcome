@@ -9,11 +9,14 @@ part 'streak_provider.g.dart';
 
 // ── Streak model (defined here since no existing streak model file exists) ───
 
+// DB user_streaks.streak_type CHECK:
+// 'daily_quest', 'prayer', 'bible_reading', 'rosary', 'mass'
 enum StreakType {
   prayer,
   bibleReading,
-  login,
-  quest,
+  rosary,
+  mass,
+  dailyQuest,
 }
 
 extension StreakTypeX on StreakType {
@@ -23,10 +26,12 @@ extension StreakTypeX on StreakType {
         return 'Prayer Streak';
       case StreakType.bibleReading:
         return 'Bible Reading Streak';
-      case StreakType.login:
-        return 'Daily Login Streak';
-      case StreakType.quest:
-        return 'Quest Streak';
+      case StreakType.rosary:
+        return 'Rosary Streak';
+      case StreakType.mass:
+        return 'Mass Streak';
+      case StreakType.dailyQuest:
+        return 'Daily Quest Streak';
     }
   }
 
@@ -36,10 +41,12 @@ extension StreakTypeX on StreakType {
         return 'prayer';
       case StreakType.bibleReading:
         return 'bible_reading';
-      case StreakType.login:
-        return 'login';
-      case StreakType.quest:
-        return 'quest';
+      case StreakType.rosary:
+        return 'rosary';
+      case StreakType.mass:
+        return 'mass';
+      case StreakType.dailyQuest:
+        return 'daily_quest';
     }
   }
 }
@@ -81,13 +88,15 @@ class StreakModel extends Equatable {
       userId: json['user_id'] as String,
       type: StreakType.values.firstWhere(
         (t) => t.databaseKey == (json['streak_type'] as String),
-        orElse: () => StreakType.login,
+        orElse: () => StreakType.prayer,
       ),
       currentStreak: json['current_streak'] as int? ?? 0,
       longestStreak: json['longest_streak'] as int? ?? 0,
-      lastActivityAt: json['last_activity_at'] != null
-          ? DateTime.parse(json['last_activity_at'] as String)
-          : null,
+      lastActivityAt: json['last_completed_date'] != null
+          ? DateTime.parse(json['last_completed_date'] as String)
+          : json['last_activity_at'] != null
+              ? DateTime.parse(json['last_activity_at'] as String)
+              : null,
       shieldActive: json['shield_active'] as bool? ?? false,
       shieldExpiresAt: json['shield_expires_at'] != null
           ? DateTime.parse(json['shield_expires_at'] as String)
@@ -218,7 +227,7 @@ class StreakNotifier extends _$StreakNotifier {
 
   Future<List<StreakModel>> _fetchStreaks(String userId) async {
     final data = await _supabase
-        .from('player_streaks')
+        .from('user_streaks')
         .select()
         .eq('user_id', userId) as List<dynamic>;
 

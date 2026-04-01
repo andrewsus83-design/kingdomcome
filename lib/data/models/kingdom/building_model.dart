@@ -34,7 +34,8 @@ class BuildingModel extends Equatable {
     return BuildingModel(
       id: json['id'] as String,
       kingdomId: json['kingdom_id'] as String,
-      type: BuildingType.values.byName(json['type'] as String),
+      type: BuildingType.fromDatabaseValue(
+          json['building_type'] as String? ?? json['type'] as String? ?? 'chapel'),
       level: json['level'] as int? ?? 1,
       gridX: json['grid_x'] as int,
       gridY: json['grid_y'] as int,
@@ -50,7 +51,7 @@ class BuildingModel extends Equatable {
     return {
       'id': id,
       'kingdom_id': kingdomId,
-      'type': type.name,
+      'building_type': type.databaseValue,
       'level': level,
       'grid_x': gridX,
       'grid_y': gridY,

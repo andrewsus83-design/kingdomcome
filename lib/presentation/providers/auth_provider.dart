@@ -77,7 +77,7 @@ class AuthNotifier extends _$AuthNotifier {
       final userId = response.user!.id;
 
       // Upsert profile row (trigger may have already created it)
-      await _client.from('profiles').upsert({
+      await _client.from('user_profiles').upsert({
         'id': userId,
         'username': username,
         'display_name': username,
@@ -111,7 +111,7 @@ class AuthNotifier extends _$AuthNotifier {
     final current = state.valueOrNull;
     if (current == null) return;
 
-    await _client.from('profiles').update({
+    await _client.from('user_profiles').update({
       'parental_consent_given': given,
     }).eq('id', current.id);
 
@@ -126,7 +126,7 @@ class AuthNotifier extends _$AuthNotifier {
 
   Future<UserModel?> _fetchUserModel(String userId) async {
     final data = await _client
-        .from('profiles')
+        .from('user_profiles')
         .select()
         .eq('id', userId)
         .maybeSingle();

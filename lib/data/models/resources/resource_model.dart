@@ -34,12 +34,18 @@ class ResourceModel extends Equatable {
 
   factory ResourceModel.fromJson(Map<String, dynamic> json) {
     return ResourceModel(
-      userId: json['user_id'] as String,
-      holyPoints: json['holy_points'] as int? ?? 0,
+      userId: json['id'] as String? ?? json['user_id'] as String? ?? '',
+      // DB stores holy points as total_holy_points
+      holyPoints: json['total_holy_points'] as int? ??
+          json['holy_points'] as int? ?? 0,
       faithCoins: json['faith_coins'] as int? ?? 0,
       blessings: json['blessings'] as int? ?? 0,
       grace: json['grace'] as int? ?? 0,
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      updatedAt: json['last_active_at'] != null
+          ? DateTime.parse(json['last_active_at'] as String)
+          : json['updated_at'] != null
+              ? DateTime.parse(json['updated_at'] as String)
+              : DateTime.now(),
     );
   }
 

@@ -13,6 +13,7 @@ import 'package:kingdomcome/data/models/kingdom/building_model.dart';
 import 'package:kingdomcome/data/models/kingdom/building_type.dart';
 import 'package:kingdomcome/presentation/providers/kingdom_provider.dart';
 import 'package:kingdomcome/presentation/widgets/common/kingdom_button.dart';
+import 'package:kingdomcome/routing/route_names.dart';
 
 class BuildingDetailScreen extends ConsumerWidget {
   final String buildingId;
@@ -231,26 +232,26 @@ class _BuildingDetailViewState extends ConsumerState<_BuildingDetailView>
   void _enterBuilding(BuildContext context, BuildingType type) {
     switch (type) {
       case BuildingType.cathedral:
-      case BuildingType.confessional:
-      case BuildingType.shrine:
-        context.push('/quests');
+      case BuildingType.chapel:
+      case BuildingType.oratory:
+        context.push(RouteNames.ark);
         break;
       case BuildingType.monastery:
-        context.push('/saints');
+        context.push(RouteNames.soul);
         break;
       case BuildingType.school:
-        context.push('/learn/quiz');
+        context.push(RouteNames.academy);
         break;
-      case BuildingType.artStudio:
-        context.push('/learn/arts');
+      case BuildingType.workshop:
+        context.push(RouteNames.workshop);
         break;
       case BuildingType.scriptorium:
-        context.push('/learn/bible');
+        context.push(RouteNames.ark);
         break;
       case BuildingType.bellTower:
-      case BuildingType.townSquare:
-      case BuildingType.fortressWall:
-        context.push('/profile');
+      case BuildingType.parishHall:
+      case BuildingType.garden:
+        context.push(RouteNames.soul);
         break;
     }
   }
@@ -307,30 +308,7 @@ class _UnlocksCard extends StatelessWidget {
     ).animate().fadeIn(delay: 200.ms);
   }
 
-  String _featureLabel(BuildingType type) {
-    switch (type) {
-      case BuildingType.cathedral:
-        return 'Mass Quests & Liturgical Events';
-      case BuildingType.monastery:
-        return 'Saints Collection & Abilities';
-      case BuildingType.school:
-        return 'Faith Quizzes & Catechism';
-      case BuildingType.artStudio:
-        return 'Sacred Art Creation';
-      case BuildingType.confessional:
-        return 'Confession & Reconciliation Quests';
-      case BuildingType.bellTower:
-        return 'Streak Bonuses & Reminders';
-      case BuildingType.townSquare:
-        return 'Parish Leaderboard & Community';
-      case BuildingType.scriptorium:
-        return 'Bible Stories & Deep Reading';
-      case BuildingType.shrine:
-        return 'Rosary, Litanies & Feast Days';
-      case BuildingType.fortressWall:
-        return 'Fasting Quests & Streak Shield';
-    }
-  }
+  String _featureLabel(BuildingType type) => type.description;
 }
 
 class _UpgradeSection extends StatelessWidget {

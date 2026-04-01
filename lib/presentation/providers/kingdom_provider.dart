@@ -50,7 +50,7 @@ class KingdomNotifier extends _$KingdomNotifier {
     try {
       final result = await _supabase.rpc('start_construction', params: {
         'p_kingdom_id': kingdom.id,
-        'p_building_type': type.name,
+        'p_building_type': type.databaseValue,
         'p_grid_x': x,
         'p_grid_y': y,
       }) as Map<String, dynamic>;
@@ -116,7 +116,7 @@ class KingdomNotifier extends _$KingdomNotifier {
   Future<KingdomModel> _fetchKingdom(String userId) async {
     final data = await _supabase
         .from('kingdoms')
-        .select('*, kingdom_buildings(*)')
+        .select('*, buildings(*)')
         .eq('user_id', userId)
         .maybeSingle();
 

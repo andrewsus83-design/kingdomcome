@@ -46,11 +46,11 @@ class SaintNotifier extends _$SaintNotifier {
     final user = ref.read(currentUserProvider);
     if (user == null) throw StateError('Not authenticated');
 
-    await _supabase.from('user_patron_saints').update({
+    await _supabase.from('user_saints').update({
       'is_active': false,
     }).eq('user_id', user.id);
 
-    await _supabase.from('user_patron_saints').upsert({
+    await _supabase.from('user_saints').upsert({
       'user_id': user.id,
       'saint_id': saintId,
       'is_active': true,
@@ -83,7 +83,7 @@ class UserSaintsNotifier extends _$UserSaintsNotifier {
     if (user == null) return [];
 
     final data = await _supabase
-        .from('user_patron_saints')
+        .from('user_saints')
         .select()
         .eq('user_id', user.id)
         .order('unlocked_at') as List<dynamic>;

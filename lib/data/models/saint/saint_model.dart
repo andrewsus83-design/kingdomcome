@@ -122,31 +122,68 @@ class SaintModel extends Equatable {
   });
 
   factory SaintModel.fromJson(Map<String, dynamic> json) {
+    // DB column names differ from original model — support both
+    final patronageRaw = json['patronage'];
+    final patronageStr = patronageRaw is List
+        ? (patronageRaw as List<dynamic>).join(', ')
+        : patronageRaw as String? ?? '';
+
+    final abilitiesRaw = json['abilities'];
+    List<SaintAbility> abilities = [];
+    if (abilitiesRaw is Map<String, dynamic>) {
+      // DB stores abilities as {passive: {...}, active: {...}} — wrap as list
+      try {
+        if (abilitiesRaw['passive'] != null) {
+          abilities.add(SaintAbility.fromJson({
+            'name': 'Passive',
+            'description': '',
+            'ability_type': abilitiesRaw['passive']['type'] as String? ?? 'multiplier',
+            'multiplier': (abilitiesRaw['passive']['value'] as num?)?.toDouble() ?? 1.0,
+            'duration_hours': 0,
+            'grace_cost': 0,
+          }));
+        }
+        if (abilitiesRaw['active'] != null) {
+          abilities.add(SaintAbility.fromJson({
+            'name': 'Active',
+            'description': '',
+            'ability_type': abilitiesRaw['active']['type'] as String? ?? 'multiplier',
+            'multiplier': (abilitiesRaw['active']['value'] as num?)?.toDouble() ?? 1.0,
+            'duration_hours': abilitiesRaw['active']['duration_hours'] as int? ?? 4,
+            'grace_cost': 50,
+          }));
+        }
+      } catch (_) {}
+    } else if (abilitiesRaw is List) {
+      abilities = (abilitiesRaw as List<dynamic>)
+          .map((a) => SaintAbility.fromJson(a as Map<String, dynamic>))
+          .toList();
+    }
+
     return SaintModel(
       id: json['id'] as String,
-      name: json['name'] as String,
-      latinName: json['latin_name'] as String,
-      feastDay: json['feast_day'] as String,
-      patronage: json['patronage'] as String,
-      shortBio: json['short_bio'] as String,
-      longBio: json['long_bio'] as String,
-      era: json['era'] as String,
-      origin: json['origin'] as String,
-      portraitAssetPath: json['portrait_asset_path'] as String,
-      cardAssetPath: json['card_asset_path'] as String,
-      rarity: json['rarity'] as String,
+      name: json['display_name'] as String? ?? json['name'] as String? ?? '',
+      latinName: json['latin_name'] as String? ?? json['slug'] as String? ?? '',
+      feastDay: json['feast_day'] as String? ?? '',
+      patronage: patronageStr,
+      shortBio: json['short_bio'] as String? ?? '',
+      longBio: json['full_bio'] as String? ?? json['long_bio'] as String? ?? '',
+      era: json['era'] as String? ?? '',
+      origin: json['origin'] as String? ?? json['era'] as String? ?? '',
+      portraitAssetPath: json['avatar_url'] as String? ??
+          json['portrait_asset_path'] as String? ?? '',
+      cardAssetPath: json['card_art_url'] as String? ??
+          json['card_asset_path'] as String? ?? '',
+      rarity: json['rarity'] as String? ?? 'common',
       requiredMonasteryLevel: json['required_monastery_level'] as int? ?? 1,
-      holyPointsCost: json['holy_points_cost'] as int? ?? 0,
-      prayerText: json['prayer_text'] as String,
+      holyPointsCost: json['unlock_cost_holy_points'] as int? ??
+          json['holy_points_cost'] as int? ?? 0,
+      prayerText: json['prayer_text'] as String? ?? '',
       relatedVerseIds: (json['related_verse_ids'] as List<dynamic>?)
               ?.map((v) => v as String)
               .toList() ??
           [],
-      abilities: (json['abilities'] as List<dynamic>?)
-              ?.map((a) =>
-                  SaintAbility.fromJson(a as Map<String, dynamic>))
-              .toList() ??
-          [],
+      abilities: abilities,
       isActive: json['is_active'] as bool? ?? true,
       sortOrder: json['sort_order'] as int? ?? 0,
     );

@@ -1,125 +1,141 @@
 enum BuildingType {
-  cathedral,
-  monastery,
-  school,
-  artStudio,
-  confessional,
-  bellTower,
-  townSquare,
+  chapel,
   scriptorium,
-  shrine,
-  fortressWall,
+  monastery,
+  garden,
+  bellTower,
+  cathedral,
+  school,
+  workshop,
+  parishHall,
+  oratory;
+
+  /// The snake_case value stored in the Supabase `building_type` enum.
+  String get databaseValue {
+    switch (this) {
+      case BuildingType.bellTower:
+        return 'bell_tower';
+      case BuildingType.parishHall:
+        return 'parish_hall';
+      default:
+        return name;
+    }
+  }
+
+  /// Parse from the database snake_case value.
+  static BuildingType fromDatabaseValue(String value) {
+    switch (value) {
+      case 'bell_tower':
+        return BuildingType.bellTower;
+      case 'parish_hall':
+        return BuildingType.parishHall;
+      default:
+        return BuildingType.values.firstWhere(
+          (t) => t.name == value,
+          orElse: () => BuildingType.chapel,
+        );
+    }
+  }
 }
 
 extension BuildingTypeX on BuildingType {
   String get displayName {
     switch (this) {
-      case BuildingType.cathedral:
-        return 'Cathedral';
-      case BuildingType.monastery:
-        return 'Monastery';
-      case BuildingType.school:
-        return 'School';
-      case BuildingType.artStudio:
-        return 'Art Studio';
-      case BuildingType.confessional:
-        return 'Confessional';
-      case BuildingType.bellTower:
-        return 'Bell Tower';
-      case BuildingType.townSquare:
-        return 'Town Square';
+      case BuildingType.chapel:
+        return 'Chapel';
       case BuildingType.scriptorium:
         return 'Scriptorium';
-      case BuildingType.shrine:
-        return 'Shrine';
-      case BuildingType.fortressWall:
-        return 'Fortress Wall';
+      case BuildingType.monastery:
+        return 'Monastery';
+      case BuildingType.garden:
+        return 'Garden';
+      case BuildingType.bellTower:
+        return 'Bell Tower';
+      case BuildingType.cathedral:
+        return 'Cathedral';
+      case BuildingType.school:
+        return 'School';
+      case BuildingType.workshop:
+        return 'Workshop';
+      case BuildingType.parishHall:
+        return 'Parish Hall';
+      case BuildingType.oratory:
+        return 'Oratory';
     }
   }
 
-  String get iconPath {
+  String get emoji {
     switch (this) {
-      case BuildingType.cathedral:
-        return 'assets/images/buildings/cathedral.png';
-      case BuildingType.monastery:
-        return 'assets/images/buildings/monastery.png';
-      case BuildingType.school:
-        return 'assets/images/buildings/school.png';
-      case BuildingType.artStudio:
-        return 'assets/images/buildings/art_studio.png';
-      case BuildingType.confessional:
-        return 'assets/images/buildings/confessional.png';
-      case BuildingType.bellTower:
-        return 'assets/images/buildings/bell_tower.png';
-      case BuildingType.townSquare:
-        return 'assets/images/buildings/town_square.png';
+      case BuildingType.chapel:
+        return '⛪';
       case BuildingType.scriptorium:
-        return 'assets/images/buildings/scriptorium.png';
-      case BuildingType.shrine:
-        return 'assets/images/buildings/shrine.png';
-      case BuildingType.fortressWall:
-        return 'assets/images/buildings/fortress_wall.png';
+        return '📜';
+      case BuildingType.monastery:
+        return '🏯';
+      case BuildingType.garden:
+        return '🌿';
+      case BuildingType.bellTower:
+        return '🔔';
+      case BuildingType.cathedral:
+        return '🕌';
+      case BuildingType.school:
+        return '🏫';
+      case BuildingType.workshop:
+        return '🔨';
+      case BuildingType.parishHall:
+        return '🏛️';
+      case BuildingType.oratory:
+        return '📿';
     }
   }
 
   String get description {
     switch (this) {
-      case BuildingType.cathedral:
-        return 'The heart of your kingdom. Unlocks Mass quests and liturgical events. '
-            'Each upgrade increases Holy Point rewards for all prayer activities.';
-      case BuildingType.monastery:
-        return 'A place of contemplation and prayer. Unlocks Saints and enables '
-            'saint ability activation. Higher levels unlock rarer Saints.';
-      case BuildingType.school:
-        return 'Educate your citizens in the faith. Unlocks quizzes and catechism '
-            'challenges. Improves Faith Coin rewards for learning activities.';
-      case BuildingType.artStudio:
-        return 'A creative space for sacred art. Unlocks stained glass, manuscript, '
-            'mosaic, and banner creation. Artwork can be displayed in your kingdom.';
-      case BuildingType.confessional:
-        return 'A sacred space for reconciliation. Unlocks confession and examination '
-            'of conscience quests. Provides Grace bonuses on completion.';
-      case BuildingType.bellTower:
-        return 'Ring the bells to call the faithful. Enables daily reminder '
-            'notifications and streak multiplier bonuses for consistent activity.';
-      case BuildingType.townSquare:
-        return 'A gathering place for the community. Unlocks parish leaderboards, '
-            'social sharing features, and community challenges.';
+      case BuildingType.chapel:
+        return 'A place of prayer and daily Mass. Unlocks prayer quests and rosary challenges.';
       case BuildingType.scriptorium:
-        return 'Where sacred texts are copied and studied. Unlocks Bible story '
-            'chapters and in-depth reading quests with enhanced Holy Point rewards.';
-      case BuildingType.shrine:
-        return 'A place of personal devotion. Unlocks rosary and litany quests. '
-            'Provides Blessings bonuses and activates feast-day special events.';
-      case BuildingType.fortressWall:
-        return 'Protects your kingdom of faith. Unlocks fasting and spiritual '
-            'warfare quests. Provides streak shield bonuses to protect streaks.';
+        return 'Where sacred texts are copied and studied. Unlocks Bible story chapters and reading quests.';
+      case BuildingType.monastery:
+        return 'A place of contemplation. Unlocks Saints and enables saint ability activation.';
+      case BuildingType.garden:
+        return 'A peaceful garden for reflection. Unlocks nature-themed quests and Ordinary Time bonuses.';
+      case BuildingType.bellTower:
+        return 'Ring the bells to call the faithful. Enables daily reminders and streak bonuses.';
+      case BuildingType.cathedral:
+        return 'The heart of your kingdom. Unlocks Mass quests and liturgical events.';
+      case BuildingType.school:
+        return 'Educate citizens in the faith. Unlocks quizzes and catechism challenges.';
+      case BuildingType.workshop:
+        return 'A creative space for sacred art. Unlocks stained glass, manuscript, and banner creation.';
+      case BuildingType.parishHall:
+        return 'A gathering place. Unlocks parish leaderboards and community challenges.';
+      case BuildingType.oratory:
+        return 'A place of personal devotion. Unlocks examination of conscience and confession quests.';
     }
   }
 
-  /// Returns the feature identifier unlocked by this building type.
   String get unlocksFeature {
     switch (this) {
-      case BuildingType.cathedral:
-        return 'feature_mass_quests';
-      case BuildingType.monastery:
-        return 'feature_saints';
-      case BuildingType.school:
-        return 'feature_quizzes';
-      case BuildingType.artStudio:
-        return 'feature_arts_crafts';
-      case BuildingType.confessional:
-        return 'feature_confession_quests';
-      case BuildingType.bellTower:
-        return 'feature_streak_bonuses';
-      case BuildingType.townSquare:
-        return 'feature_parish_leaderboard';
+      case BuildingType.chapel:
+        return 'feature_prayer_quests';
       case BuildingType.scriptorium:
         return 'feature_bible_stories';
-      case BuildingType.shrine:
-        return 'feature_rosary_quests';
-      case BuildingType.fortressWall:
-        return 'feature_streak_shield';
+      case BuildingType.monastery:
+        return 'feature_saints';
+      case BuildingType.garden:
+        return 'feature_nature_quests';
+      case BuildingType.bellTower:
+        return 'feature_streak_bonuses';
+      case BuildingType.cathedral:
+        return 'feature_mass_quests';
+      case BuildingType.school:
+        return 'feature_quizzes';
+      case BuildingType.workshop:
+        return 'feature_arts_crafts';
+      case BuildingType.parishHall:
+        return 'feature_parish_leaderboard';
+      case BuildingType.oratory:
+        return 'feature_confession_quests';
     }
   }
 }

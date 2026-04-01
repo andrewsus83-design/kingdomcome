@@ -29,7 +29,7 @@ class KingdomModel extends Equatable {
       name: json['name'] as String,
       level: json['level'] as int? ?? 1,
       landSize: json['land_size'] as int? ?? 10,
-      bannerImageUrl: json['banner_image_url'] as String?,
+      bannerImageUrl: json['banner_url'] as String? ?? json['banner_image_url'] as String?,
       foundedAt: DateTime.parse(json['founded_at'] as String),
       buildings: (json['buildings'] as List<dynamic>?)
               ?.map((b) => BuildingModel.fromJson(b as Map<String, dynamic>))

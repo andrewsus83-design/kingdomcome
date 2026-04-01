@@ -25,20 +25,24 @@ class UserModel extends Equatable {
     this.parishId,
     required this.createdAt,
     required this.lastActiveAt,
-  }) : assert(ageGroup >= 1 && ageGroup <= 3, 'ageGroup must be 1, 2, or 3');
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as String,
-      username: json['username'] as String,
-      displayName: json['display_name'] as String,
+      username: json['username'] as String? ?? '',
+      displayName: json['display_name'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String?,
-      ageGroup: json['age_group'] as int,
+      ageGroup: (json['age_group'] as int?)?.clamp(1, 3) ?? 1,
       parentalConsentGiven: json['parental_consent_given'] as bool? ?? false,
       parentEmail: json['parent_email'] as String?,
       parishId: json['parish_id'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      lastActiveAt: DateTime.parse(json['last_active_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      lastActiveAt: json['last_active_at'] != null
+          ? DateTime.parse(json['last_active_at'] as String)
+          : DateTime.now(),
     );
   }
 
