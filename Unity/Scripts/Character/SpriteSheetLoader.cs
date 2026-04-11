@@ -4,10 +4,6 @@ using UnityEngine.Networking;
 
 namespace KingdomCome.Character
 {
-    /// <summary>
-    /// Downloads sprite sheets from Supabase storage at runtime,
-    /// slices into frames based on column/row grid, feeds to CharacterAnimator.
-    /// </summary>
     [RequireComponent(typeof(CharacterAnimator))]
     public class SpriteSheetLoader : MonoBehaviour
     {
@@ -18,8 +14,12 @@ namespace KingdomCome.Character
         public string urlRight;
 
         [Header("Grid Layout")]
-        public int columns = 5;
-        public int rows    = 6;
+        public int columns  = 5;
+        public int rows     = 6;
+
+        [Header("Which rows to use (0 = top row)")]
+        public int startRow = 0;
+        public int useRows  = 1;
 
         CharacterAnimator anim;
 
@@ -53,22 +53,23 @@ namespace KingdomCome.Character
             }
 
             var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            tex.filterMode = FilterMode.Point;
+            tex.filterMode = FilterMode.Bilinear;
             tex.LoadImage(req.downloadHandler.data);
             req.Dispose();
 
             int frameW = tex.width  / columns;
             int frameH = tex.height / rows;
-            Debug.Log($"[SpriteSheetLoader] {tex.width}x{tex.height} → frame {frameW}x{frameH} ({columns}x{rows} grid)");
+            int count  = columns * useRows;
+            Debug.Log($"[SpriteSheetLoader] {tex.width}x{tex.height} → cell {frameW}x{frameH}, using row {startRow}–{startRow+useRows-1} ({count} frames)");
 
-            var frames = new Sprite[columns * rows];
-            for (int row = rows - 1; row >= 0; row--)
-            for (int col = 0; col < columns; col++)
+            var frames = new Sprite[count];
+            for (int r = 0; r < useRows; r++)
+            for (int c = 0; c < columns; c++)
             {
-                int i    = (rows - 1 - row) * columns + col;
-                var rect = new Rect(col * frameW, row * frameH, frameW, frameH);
-                frames[i] = Sprite.Create(tex, rect,
-                    new Vector2(0.5f, 0.5f), Mathf.Max(frameW, frameH));
+                int i      = r * columns + c;
+                int texRow = rows - 1 - (startRow + r);   // flip: Unity UV is bottom-up
+                var rect   = new Rect(c * frameW, texRow * frameH, frameW, frameH);
+                frames[i]  = Sprite.Create(tex, rect, new Vector2(0.5f, 0.5f), 100f);
             }
             onDone(frames);
         }
