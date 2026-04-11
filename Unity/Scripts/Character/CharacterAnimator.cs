@@ -18,6 +18,9 @@ namespace KingdomCome.Character
         [Header("Animation")]
         public float frameRate = 8f;
 
+        [Tooltip("If true, only show the first frame per direction (no walking animation)")]
+        public bool staticPoseOnly = true;
+
         SpriteRenderer sr;
         Sprite[]        activeFrames;
         int             frameIndex;
@@ -53,6 +56,7 @@ namespace KingdomCome.Character
         void Update()
         {
             if (!isMoving || activeFrames == null || activeFrames.Length == 0) return;
+            if (staticPoseOnly) return;   // just show frame 0, no cycling
 
             timer += Time.deltaTime;
             if (timer < 1f / frameRate) return;
