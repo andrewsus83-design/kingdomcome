@@ -1,7 +1,10 @@
 {
   "mcpServers": {
     "ludo": {
-      "url": "https://mcp.ludo.ai/mcp"
+      "url": "https://mcp.ludo.ai/mcp",
+      "headers": {
+        "Authorization": "$LUDO_API_KEY"
+      }
     }
   }
 }
