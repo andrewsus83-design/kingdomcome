@@ -10,7 +10,7 @@ namespace KingdomCome.Supabase
     {
         void Awake()
         {
-            if (FindObjectsOfType<KingdomComeBootstrap>().Length > 1)
+            if (FindObjectsByType<KingdomComeBootstrap>(FindObjectsSortMode.None).Length > 1)
             {
                 Destroy(gameObject);
                 return;
