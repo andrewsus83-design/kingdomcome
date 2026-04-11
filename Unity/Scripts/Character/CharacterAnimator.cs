@@ -33,6 +33,16 @@ namespace KingdomCome.Character
             activeFrames = framesDown;
         }
 
+        /// <summary>Called by SpriteSheetLoader after frames are downloaded.</summary>
+        public void ShowIdleFrame()
+        {
+            activeFrames = framesDown;
+            frameIndex   = 0;
+            if (activeFrames != null && activeFrames.Length > 0)
+                sr.sprite = activeFrames[0];
+            Debug.Log($"[CharacterAnimator] Loaded {activeFrames?.Length ?? 0} frames. Sprite shown.");
+        }
+
         /// <summary>Call from PlayerMovement every frame with the input vector.</summary>
         public void SetMovement(Vector2 input)
         {

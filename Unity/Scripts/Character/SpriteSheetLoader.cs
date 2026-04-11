@@ -33,6 +33,9 @@ namespace KingdomCome.Character
             yield return Load(urlUp,    frames => anim.framesUp    = frames);
             yield return Load(urlLeft,  frames => anim.framesLeft  = frames);
             yield return Load(urlRight, frames => anim.framesRight = frames);
+
+            // Show first frame immediately after download completes
+            anim.ShowIdleFrame();
         }
 
         IEnumerator Load(string url, System.Action<Sprite[]> onDone)
