@@ -5,19 +5,21 @@ using UnityEngine.Networking;
 namespace KingdomCome.Character
 {
     /// <summary>
-    /// Downloads a sprite sheet from Supabase storage at runtime,
-    /// slices it into 256x256 frames, and feeds them to CharacterAnimator.
+    /// Downloads sprite sheets from Supabase storage at runtime,
+    /// slices into frames based on column/row grid, feeds to CharacterAnimator.
     /// </summary>
     [RequireComponent(typeof(CharacterAnimator))]
     public class SpriteSheetLoader : MonoBehaviour
     {
-        public const int FrameSize = 256;
-
         [Header("Supabase sprite sheet URLs")]
         public string urlDown;
         public string urlUp;
         public string urlLeft;
         public string urlRight;
+
+        [Header("Grid Layout")]
+        public int columns = 5;
+        public int rows    = 6;
 
         CharacterAnimator anim;
 
@@ -33,8 +35,6 @@ namespace KingdomCome.Character
             yield return Load(urlUp,    frames => anim.framesUp    = frames);
             yield return Load(urlLeft,  frames => anim.framesLeft  = frames);
             yield return Load(urlRight, frames => anim.framesRight = frames);
-
-            // Show first frame immediately after download completes
             anim.ShowIdleFrame();
         }
 
@@ -42,31 +42,34 @@ namespace KingdomCome.Character
         {
             if (string.IsNullOrEmpty(url)) yield break;
 
-            using var req = UnityWebRequestTexture.GetTexture(url);
+            var req = UnityWebRequest.Get(url);
             yield return req.SendWebRequest();
 
             if (req.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"[SpriteSheetLoader] Failed: {url}\n{req.error}");
+                Debug.LogError($"[SpriteSheetLoader] Failed: {req.error}");
+                req.Dispose();
                 yield break;
             }
 
-            var tex    = DownloadHandlerTexture.GetContent(req);
-            tex.filterMode = FilterMode.Point;  // crisp pixel art
+            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
+            tex.LoadImage(req.downloadHandler.data);
+            req.Dispose();
 
-            int cols   = tex.width  / FrameSize;
-            int rows   = tex.height / FrameSize;
-            var frames = new Sprite[cols * rows];
+            int frameW = tex.width  / columns;
+            int frameH = tex.height / rows;
+            Debug.Log($"[SpriteSheetLoader] {tex.width}x{tex.height} → frame {frameW}x{frameH} ({columns}x{rows} grid)");
 
-            for (int row = rows - 1; row >= 0; row--)      // Unity UV: bottom-up
-            for (int col = 0; col < cols; col++)
+            var frames = new Sprite[columns * rows];
+            for (int row = rows - 1; row >= 0; row--)
+            for (int col = 0; col < columns; col++)
             {
-                int i  = (rows - 1 - row) * cols + col;
-                var rect = new Rect(col * FrameSize, row * FrameSize, FrameSize, FrameSize);
+                int i    = (rows - 1 - row) * columns + col;
+                var rect = new Rect(col * frameW, row * frameH, frameW, frameH);
                 frames[i] = Sprite.Create(tex, rect,
-                    new Vector2(0.5f, 0.5f), FrameSize);
+                    new Vector2(0.5f, 0.5f), Mathf.Max(frameW, frameH));
             }
-
             onDone(frames);
         }
     }
