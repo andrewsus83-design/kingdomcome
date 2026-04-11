@@ -8,13 +8,16 @@ namespace KingdomCome.Supabase
     /// </summary>
     public class KingdomComeBootstrap : MonoBehaviour
     {
+        static KingdomComeBootstrap _instance;
+
         void Awake()
         {
-            if (FindObjectsByType<KingdomComeBootstrap>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length > 1)
+            if (_instance != null)
             {
                 Destroy(gameObject);
                 return;
             }
+            _instance = this;
 
             DontDestroyOnLoad(gameObject);
 
